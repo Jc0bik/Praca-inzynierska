@@ -1,0 +1,37 @@
+﻿@model IEnumerable<InzV3.Models.DeviceModel>
+@{
+    ViewBag.Title = "Moje urządzenia";
+    Layout= "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-pc-display text-primary"></i> Moje urządzenia</h2>
+        <a class="btn btn-secondary" href="@Url.Action("Index", "Home")">Powrót</a>
+
+    </div>
+    <hr />
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                var category = item.Charachteristics.FirstOrDefault()?.DevCategory?.category_name ?? "Brak kategorii";
+                <div class="col-md-12 mb-3">
+                    <div class="card h-100 shadow-sm border-primary" style="cursor:pointer;"
+                         onclick="location.href='@Url.Action("Details", "UserDevice", new { id = item.id_device })'">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">@item.brand @item.model</h5>
+                            <h4 class="text-primary fw-bold">@category</h4>
+                            <p class="text-muted small">ID: @item.id_device</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted">Brak przypisanych urządzeń.</p>
+        }
+    </div>
+</div>
