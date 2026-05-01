@@ -1,0 +1,57 @@
+﻿
+@{
+    ViewBag.Title = "Panel Serwisanta";
+}
+
+<div class="mt-4">
+    <h2><i class="bi bi-tools text-warning"></i>Panel Serwisanta</h2>
+    <hr />
+    <div class="row mt-4">
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100 border-warning">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h4 class="card-title text-warning">Urządzenia</h4>
+                    <div class="mt-auto">
+                        @Html.ActionLink("Zarządzaj", "Index", "Devices", null, new { @class = "btn btn-warning px-4" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100 border-warning">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h4 class="card-title text-warning">Oprogramowanie</h4>
+                    <div class="mt-auto">
+                        @Html.ActionLink("Zarządzaj", "Index", "Software", null, new { @class = "btn btn-warning px-4" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100 border-warning">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h4 class="card-title text-warning">Użytkownicy</h4>
+                    <div class="mt-auto">
+                        @Html.ActionLink("Zarządzaj", "Users", "Service", null, new { @class = "btn btn-warning px-4" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100 border-warning">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h4 class="card-title text-warning">Zgłoszenia</h4>
+                    <div class="mt-auto">
+                        <button class="btn btn-warning px-4" disabled>Wkrótce...</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

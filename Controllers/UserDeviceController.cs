@@ -1,0 +1,60 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
+using InzV3.Models;
+using System.Runtime.Remoting.Contexts;
+using System.Data.Entity.Core.Common.CommandTrees;
+using System.Data.Entity;
+namespace InzV3.Controllers
+{
+    [Authorize]
+    public class UserDeviceController : Controller
+    {
+        private ApplicationDbContext db = new ApplicationDbContext();
+        // GET: UserDevice
+        public ActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            string curentUserId = User.Identity.GetUserId();
+            var device = db.Devices.Include(d => d.Charachteristics.Select(c => c.DevFeature))
+                .SingleOrDefault(d => d.id_device == id && d.id_user == curentUserId);
+            if (device == null)
+            {
+                return HttpNotFound("Nie masz uprawnień do przeglądania szczegółów tego urządzenia");
+            }
+            ViewBag.Software = db.Software.Where(s => s.assigned_device == id).ToList();
+            ViewBag.Ratings = db.DeviceRating.Where(r => r.id_device == id).ToList();
+            return View(device);
+        }   
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult SaveRatings(FormCollection form)
+        {
+            int id_device = int.Parse(form["id_device"]);
+            string currentUserId = User.Identity.GetUserId();
+            if (!db.Devices.Any(d => d.id_device == id_device && d.id_user == currentUserId))
+            {
+                return new HttpUnauthorizedResult();
+
+            }
+            var ratings = db.DeviceRating.Where(r => r.id_device == id_device).ToList();
+            foreach (var rating in ratings)
+            {
+                string val = form["rating_" + rating.id_rating];
+                if (!string.IsNullOrEmpty(val))
+                {
+                    rating.rating_value = int.Parse(val);
+                }
+            }
+            db.SaveChanges();
+            return RedirectToAction("Details", new { id = id_device });
+        }
+    }
+}

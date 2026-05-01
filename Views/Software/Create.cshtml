@@ -1,0 +1,80 @@
+﻿@model InzV3.Models.SoftwareModel
+@{ ViewBag.Title = "Nowe oprogramowanie"; }
+
+<h2>Dodaj Oprogramowanie</h2>
+<hr />
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-7">
+            <div class="mb-3">
+                <label class="form-label">Nazwa Oprogramowania</label>
+                @Html.EditorFor(m => m.software_name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(m => m.software_name, "", new { @class = "text-danger" })
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Numer seryjny / ID subskrypcji</label>
+                @Html.EditorFor(m => m.software_serial_number, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Klucz licencyjny</label>
+                @Html.EditorFor(m => m.license_key, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Data końca licencji</label>
+                    @Html.EditorFor(m => m.license_end_date, new { htmlAttributes = new { @class = "form-control", type = "date" } })
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Kategoria</label>
+                    @Html.DropDownListFor(m => m.software_category, ViewBag.Categories as SelectList, "Wybierz...", new { @class = "form-select" })
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <div class="card bg-light">
+                <div class="card-header">Przypisanie do urządzenia</div>
+                <div class="card-body">
+                    <p class="small text-muted">Wpisz S/N urządzenia, aby je przypisać:</p>
+                    <input type="text" id="devSerial" class="form-control mb-3" placeholder="Wpisz numer seryjny sprzętu..." autocomplete="off">
+
+                    <div id="devPreview" class="alert alert-secondary d-none">
+                    </div>
+                    @Html.HiddenFor(m => m.assigned_device, new { id = "targetId" })
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success px-4">Zapisz</button>
+        @Html.ActionLink("Wróć", "Index", null, new { @class = "btn btn-outline-secondary" })
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $('#devSerial').on('input', function() {
+            var val = $(this).val();
+            if(val.length > 2) {
+                $.get('@Url.Action("GetDeviceInfo", "Software")', { serial: val }, function(res) {
+                    if(res.success) {
+                        $('#devPreview').removeClass('d-none alert-danger alert-secondary').addClass('alert-success');
+                        $('#devPreview').html('<strong>✓ Znaleziono:</strong> ' + res.brand + ' ' + res.model + ' (ID: ' + res.id + ')');
+                        $('#targetId').val(res.id);
+                    } else {
+                        $('#devPreview').removeClass('d-none alert-success alert-secondary').addClass('alert-danger');
+                        $('#devPreview').html('Nie znaleziono urządzenia o tym S/N');
+                        $('#targetId').val('');
+                    }
+                });
+            } else {
+                $('#devPreview').addClass('d-none');
+                $('#targetId').val('');
+            }
+        });
+    </script>
+}

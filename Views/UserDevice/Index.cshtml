@@ -1,0 +1,103 @@
+﻿@model IEnumerable<InzV3.Models.DeviceModel>
+
+@{
+    ViewBag.Title = "Urządzenia";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Urządzenia</h2>
+
+<p>
+    @Html.ActionLink("Create New", "CreateOne",null, new {@class ="btn btn-outline-primary"})
+</p>
+<table class="table text-center align-middle" style="font-size:18px;">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.id_device)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.brand)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.model)
+        </th>
+        <th> 
+            @Html.DisplayNameFor(model=>model.status)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.id_user)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.id_device)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.brand)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.model)
+        </td>
+        <td>
+            @{ 
+                if(string.Equals(item.status, "W użyciu", StringComparison.OrdinalIgnoreCase))
+                {
+                    <span class="badge bg-success p-2" style="font-size:0.85em;"> W użyciu</span>
+                }
+                else if(string.Equals(item.status, "Nieprzypisany", StringComparison.OrdinalIgnoreCase))
+                {
+                    <span class="badge bg-secondary p-2" style="font-size: 0.85em;">Nieprzypisany</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary p-2" style="font-size: 0.85em;">@(string.IsNullOrEmpty(item.status) ? "Nieprzypisany" : item.status)</span>
+                }
+            }
+        </td>
+        <td>
+            @{
+                if (item.User != null)
+                {
+                    <span class="fw-bold text-primary">@item.User.FirstName @item.User.LastName</span>
+                    <br/><small class="text-muted">@item.User.Email</small>
+                }
+                else
+                {
+                    <span class="text-muted small">Brak</span>
+                }
+            }
+
+        </td>
+        <td>
+            <a class="btn btn-primary me-1" href="@Url.Action("Edit", new { id = item.id_device })" role="button">Edytuj</a>
+            <a class="btn btn-secondary me-1" href="@Url.Action("Details", new { id = item.id_device })" role="button">Szczegóły</a>
+            <button type="button" class="btn btn-danger me-1" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.id_device">
+                Usuń
+            </button>
+            <div class="modal fade text-start" id="deleteModal-@item.id_device" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Potwierdzenie usunięcia</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            Czy na pewno chcesz usunąć to urządzenie?<strong>@item.brand @item.model</strong><br />
+                            <span class="text-muted" style="font-size:0.9em;">(Ta operacja jest nieodwracalna)</span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                            <a class="btn btn-danger me-1" href="@Url.Action("Delete", new { id = item.id_device })" role="button">Tak, usuń</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    
+}
+</table>

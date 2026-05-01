@@ -1,0 +1,71 @@
+﻿
+@model IEnumerable<InzV3.Controllers.UserListViewModel>
+
+@{
+    ViewBag.Title = "Lista użytkowników";
+}
+<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+    <h2><i class="bi bi-people text-warning me-2"></i>Użytkownicy systemu</h2>
+    <a href="@Url.Action("Index", "Service")" class="btn btn-secondary">Powrót</a>
+</div>
+<div class="card bg-light p-3 mb-4 shadow-sm">
+    <form method="get" action="@Url.Action("Users","Service")">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <input type="text" name="searchString" class="form-control" placeholder="Szukaj" value="@Request.QueryString["searchString"]" />
+            </div>
+            <div class="col-md-4">
+                @Html.DropDownList("roleFilter", (SelectList)ViewBag.Roles, "Wszystkie role", new { @class = "form-select" })
+            </div>
+            <div class="col-md-3 text-end">
+                <button type="submit" class="btn btn-primary w-100 mb-1">Szukaj / Filtry</button>
+                <a href="@Url.Action("Users", "Service")" class="btn btn-outline-secondary w-100">Resetuj filtry</a>
+            </div>
+        </div>
+    </form>
+</div>
+<table class="table table-hover shadow-sm border">
+    <thead class="table-dark">
+        <tr>
+            <th>Imię</th>
+            <th>Nazwisko</th>
+            <th>Email</th>
+            <th>Rola w systemie</th>
+            <th>Podrola</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FirstName</td>
+                <td>@user.LastName</td>
+                <td>@user.Email</td>
+                <td>
+                    @if (user.Role == "Admin")
+                    {
+                        <span class="badge bg-danger">@user.Role</span>
+                    }
+                    else if (user.Role == "Pracownik Serwisu")
+                    {
+                        <span class="badge bg-warning text-dark">@user.Role</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-primary">@user.Role</span>
+                    }
+                </td>
+                <td>
+                    @if (!string.IsNullOrEmpty(user.SubRole))
+                    {
+                        <span class="badge bg-info text-dark">@user.SubRole</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted small">Brak</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

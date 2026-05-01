@@ -1,0 +1,144 @@
+﻿
+@model IEnumerable<InzV3.Models.SoftwareModel>
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2 class="mb-4">Oprogramowanie</h2>
+<div class="card mb-4 shadow-sm border-warning">
+    <div class="card-body">
+        @using (Html.BeginForm("Index", "Software", FormMethod.Get, new { @class = "row g-3 align-items-end" }))
+        {
+            <div class="col-md-2">
+                <label class="form-label">Nazwa</label>
+                @Html.TextBox("searchName", null, null, new { @class = "form-control" })
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Numer seryjny</label>
+                @Html.TextBox("searchSerial", null, null, new { @class = "form-control" })
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Kategoria</label>
+                @Html.DropDownList("categoryFilter", ViewBag.Categories as SelectList, "Wszystkie", new { @class = "form-select" })
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Status</label>
+                <select name="statusFilter" class="form-select">
+                    <option value="">Wszystkie</option>
+                    <option value="Nieprzypisane">Nieprzypisane</option>
+                    <option value="Przypisane">Przypisane</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Data</label>
+                <select name="sortOrder" class="form-select">
+                    <option value="">Domyślne sortowanie</option>
+                    <option value="date_asc">Najbliżej końca</option>
+                    <option value="date_desc">Najdalej końca</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-warning w-100">Szukaj</button>
+            </div>
+        }
+    </div>
+</div>
+<p>
+    @Html.ActionLink("Dodaj", "Create", null, new { @class = "btn btn-success" })
+</p>
+<table class="table table-hover align-middle">
+    <thead class="table-dark">
+        <tr>
+            <th>Nazwa</th>
+            <th>Kategoria</th>
+            <th>Data ważności</th>
+            <th>Id sprzętu</th>
+            <th>Numer seryjny</th>
+            <th>Akcje</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td><strong>@item.software_name</strong></td>
+                <td>@item.software_category</td>
+                <td>
+                    @(item.license_end_date.HasValue ? item.license_end_date.Value.ToString("yyyy-MM-dd") : "Lifetime")
+                </td>
+                <td>
+                    @if (item.assigned_device.HasValue)
+                    {
+                        <span class="badge bg-info text-dark">ID: @item.assigned_device</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">nieprzypisany</span>
+                    }
+                </td>
+                <td>@(string.IsNullOrEmpty(item.software_serial_number) ? "-" : item.software_serial_number)</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-info" onclick="showKey('@item.license_key')">Szczegóły</button>
+                    @Html.ActionLink("Zarządzaj", "Edit", new { id = item.id_software }, new { @class = "btn btn-sm btn-warning" })
+                    @if (!item.assigned_device.HasValue)
+                    {
+                        <button class="btn btn-sm btn-danger" onclick="confirmDel('@item.id_software', '@item.software_name')">Usuń</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal fade" id="keyModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Klucz licencyjny</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <h4 id="keyVal" class="font-monospace text-primary"></h4>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="delModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Potwierdź usunięcie</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Czy na pewno chcesz usunąć oprogramowanie <strong id="delName"></strong>?
+            </div>
+            <div class="modal-footer">
+                @using (Html.BeginForm("Delete", "Software", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="id" name="delId" />
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-danger">Usuń</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showKey(val) {
+            $('#keyVal').text(val || "Brak klucza w bazie");
+            var myModal = new bootstrap.Modal(document.getElementById('keyModal'));
+            myModal.show();
+        }
+
+        function confirmDel(id, name) {
+            $('#delId').val(id);
+            $('#delName').text(name);
+            var myModal = new bootstrap.Modal(document.getElementById('delModal'));
+            myModal.show();
+        }
+    </script>
+}

@@ -1,0 +1,61 @@
+﻿@model IEnumerable <Microsoft.AspNet.Identity.EntityFramework.IdentityRole>
+@{
+    ViewBag.Title = "Zarządzanie rolami";
+}
+
+<div class="mt-4">
+    <h2>Role w systemie</h2>
+    @if (TempData["Error"] != null)
+            {
+               <div class="alert alert-danger">@TempData["Error"]</div>
+            }
+    <p class="mt-3">
+        @Html.ActionLink("Dodaj nową rolę", "Create", null, new { @class = "btn btn-success" })
+        @Html.ActionLink("Wróć", "Index", "Admin", null, new { @class = "btn btn-secondary ms-2" })
+    </p>
+    <table class="table table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Nazwa roli</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in Model)
+            {
+                <tr>
+                    <td class="fw-bold align-middle">@role.Name</td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@role.Id">
+                            Usuń
+                        </button>
+                        <div class="modal fade text-start" id="deleteModal-@role.Id" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title text-danger" id="modalLabel-@role.Id">
+                                        <i>Potwierdzenie usunięcia</i>
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+                                    </div>
+                                    <div class="modal-body text-start text-wrap">
+                                        <p>Usuwanie roli: <strong>@role.Name</strong></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                                        @using (Html.BeginForm("Delete", "Roles", new { id = role.Id }, FormMethod.Post, new {style = "margin: 0;"}))
+                                        {
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-danger">Usuń</button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

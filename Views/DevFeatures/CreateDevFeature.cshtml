@@ -1,0 +1,33 @@
+﻿@model InzV3.Models.DevFeature
+@{
+    ViewBag.Title = "DeleteDevFeature";
+}
+
+<div class="mt-4">
+    <h2>Dodaj nową cechę szczególną</h2>
+    <hr />
+    <div>
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+            <div class="form-horizontal">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group row mb-3">
+                    @Html.LabelFor(model => model.dev_feature_name, htmlAttributes: new { @class = "col-form-label col-md-2 fw-bold" })
+                    <div class="col-md-6">
+                        @Html.EditorFor(model => model.dev_feature_name, new { htmlAttributes = new { @class = "form-control", placeholder = "np. Lekki, Wytrzymały, Długo trzymająca bateria..." } })
+                        @Html.ValidationMessageFor(model => model.dev_feature_name, "", new { @class = "text-danger" })
+
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="offset-md-2 col-md-10">
+                        <input type="submit" value="Zapisz" class="btn btn-primary" />
+                        @Html.ActionLink("Powrót do listy", "Index", null, new { @class = "btn btn-secondary ms-2" })
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

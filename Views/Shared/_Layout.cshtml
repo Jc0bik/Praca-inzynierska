@@ -1,0 +1,73 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - moja aplikacja platformy ASP.NET</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    @if (ViewBag.HideNavbar != true)
+    {
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                @Html.ActionLink("IT Resources", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll"
+                        aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                    
+                <div class="collapse navbar-collapse" id="navbarScroll">
+                    <ul class="navbar-nav ma-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+
+                        <li class="nav-item">
+                            @Html.ActionLink("Strona główna", "Index", "Home", null, new { @class = "nav-link fw-bold" })
+                        </li>
+                        @*Panel serwisanta*@
+                        @if (User.IsInRole("Admin") || User.IsInRole("Pracownik Serwisu"))
+                        {
+                            <li class="nav-item">
+                            @Html.ActionLink("Panel serwisanta", "Index", "Service", null, new { @class = "nav-link fw-bold" })
+                            </li>
+                        }
+
+                        @*Ten element będzie wyświetlany tylko adminowi*@
+                        @if(User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                @Html.ActionLink("Panel Administratora", "Index", "Admin", null, new { @class = "nav-link fw-bold" })
+                            </li>
+                            }
+                        </ul>
+                    @*@if (ViewContext.RouteData.Values["controller"].ToString() == "Devices")
+                    {
+                        using (Html.BeginForm("SearchName", "Devices", FormMethod.Get))
+                        {
+                            <div class="d-flex">
+                                <input class="form-control me-2" type="search" name="searchPh" placeholder="..." aria-label="Szukaj" />
+                                <button class="btn btn-outline-success" type="submit">Szukaj</button>
+                            </div>
+                        }
+                    }*@
+                    @Html.Partial("_LoginPartial")
+                </div>
+            </div>
+        </nav>
+    }
+
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Moja aplikacja ASP.NET</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

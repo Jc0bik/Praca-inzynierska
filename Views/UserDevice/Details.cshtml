@@ -1,0 +1,124 @@
+﻿@model InzV3.Models.DeviceModel
+@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Szczegóły urządzenia";
+    var software = ViewBag.Software as List<InzV3.Models.SoftwareModel>;
+    var ratings = ViewBag.Ratings as List<InzV3.Models.DeviceRating>;
+    var currentUserId = User.Identity.GetUserId();
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2 class="text-center">@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header"><h5>Informacje o sprzęcie</h5></div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-5"> Id urządzenia</dt>
+                    <dd class="col-sm-7">@Model.id_device</dd>
+
+                    <dt class="col-sm-5">Marka i model</dt>
+                    <dd class="col-sm-7">@Model.brand @Model.model</dd>
+
+                    <dt class="col-sm-5">Numer seryjny</dt>
+                    <dd class="col-sm-7">@Model.serial_num</dd>
+
+                    <dt class="col-sm-5">Koniec gwarancji</dt>
+                    <dd class="col-sm-7">@(Model.warranty.HasValue ? Model.warranty.Value.ToShortDateString(): "Brak danych")</dd>
+                </dl>
+
+                
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header"><h5>Obecne oceny</h5></div>
+            <div class="card-body">
+                @if (ratings != null && ratings.Any())
+                {
+                    foreach (var r in ratings)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>@r.category_name</span>
+                            <span class="badge bg-info text-dark">@r.rating_value/5</span>
+                        </div>
+                    }
+                }
+                @if (Model.id_user == currentUserId)
+                {
+                    <button class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#ratingModal">
+                        Oceń urządzenie
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col=md-6">
+        <div class="card">
+            <div class="card-header"><h5>Przypisane oprogramowanie</h5></div>
+            <div class="card-body">
+                @if (software != null && software.Any())
+                {
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Nazwa</th>
+                                <th>Data ważności</th>
+                                <th>Numer seryjny</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in software)
+                            {
+                                <tr>
+                                    <td>@s.software_name</td>
+                                    <td>@(s.license_end_date.HasValue ? s.license_end_date.Value.ToShortDateString() : "Bezterminowa")</td>
+                                    <td>@(string.IsNullOrEmpty(s.software_serial_number) ? "Brak" : s.software_serial_number)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted">Brak przypisanego oprogramowania</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@*POPRAWIĆ TO*@
+<div class="modal fade" id="ratingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("SaveRatings", "UserDevice", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken() <input type="hidden" name="id_device" value="@Model.id_device" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Oceń parametry sprzętu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @foreach (var r in ratings)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">@r.category_name (Obecnie: @r.rating_value)</label>
+                            <input type="range" class="form-range" name="rating_@r.id_rating" min="1" max="5" step="1" value="@r.rating_value">
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-success">Zapisz oceny</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<p class="mt-3">
+    <a class="btn btn-outline-secondary" href="@Url.Action("Index", "Home")">Powrót do strony głównej</a>
+</p>

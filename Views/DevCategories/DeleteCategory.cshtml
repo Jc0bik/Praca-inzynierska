@@ -1,0 +1,29 @@
+﻿@model InzV3.Models.DevCategory
+@{
+    ViewBag.Title = "DeleteCategory";
+}
+
+<div class="mt-4">
+    <h2>Usuń kategorię</h2>
+    <h4 class="text-danger mt-3">Czy na pewno chcesz usunąć tę kategorię?</h4>
+    <hr />
+    <div>
+        <dl class="row mt-3">
+            <dt class="col-sm-3 fw-bold">
+                Nazwa kategorii:
+            </dt>
+            <dd class="col-sm-9 fs-5">
+                @Html.DisplayFor(model => model.category_name)
+            </dd>
+        </dl>
+        @using (Html.BeginForm())
+         {
+            @Html.AntiForgeryToken()
+            <div class="mt-4">
+                <input type="submit" value="Usuń" class="btn btn-danger" />
+                @Html.ActionLink("Anuluj", "Index", null, new { @class = "btn btn-secondary ms-2" })
+            </div>
+         }
+    </div>
+</div>
+

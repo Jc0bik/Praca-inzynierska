@@ -1,0 +1,71 @@
+﻿@model InzV3.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Zarejestruj nowego użytkownika";
+}
+
+<div class="mt-4">
+    <h2>@ViewBag.Title</h2>
+    <hr />
+    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        <h4 class="mb-4">Dane użytkownika</h4>
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+        <div class="form-group row mb-2">
+            @Html.LabelFor(m => m.FirstName, new { @class = "col-md-3 col-form-label fw-bold text-md-end" })
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            @Html.LabelFor(m => m.LastName, new { @class = "col-md-3 col-form-label fw-bold text-md-end" })
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            @Html.LabelFor(m => m.Email, new { @class = "col-md-3 col-form-label fw-bold text-md-end" })
+            <div class="col-md-6">
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+            </div>
+        </div>
+        <hr class="my-4" />
+        <div class="form-group row mb-2">
+            @Html.LabelFor(m => m.RoleName, new { @class = "col-md-3 col-form-label fw-bold text-md-end" })
+            <div class="col-md-6">
+                @Html.DropDownListFor(m => m.RoleName, (SelectList)ViewBag.Roles, "Wybierz rolę", new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group row mb-2">
+            @Html.LabelFor(m => m.SubRole, new { @class = "col-md-3 col-form-label fw-bold text-md-end" })
+            <div class="col-md-6">
+                @Html.DropDownListFor(m => m.SubRole, (SelectList)ViewBag.SubRoles, "Brak/Pracownik Serwisu", new { @class = "form-control" })
+                <small class="form-text text-muted">Dotyczy tylko użytkownika z rolą "Pracownik.</small>
+            </div>
+        </div>
+        <hr class="my-4" />
+        <div class="form-group row mb-2">
+            @Html.LabelFor(m => m.Password, new { @class = "col-md-3 col-form-label fw-bold text-md-end" })
+            <div class="col-md-6">
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group row mb-4">
+            @Html.LabelFor(m => m.ConfirmPassword, new { @class = "col-md-3 col-form-label fw-bold text-md-end" })
+            <div class="col-md-6">
+                @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="form-group row mb-4">
+            <div class="offset-md-3 col-md-9">
+                <input type="submit" value="Zarejestruj" class="btn btn-success" />
+                @Html.ActionLink("Anuluj i wróc", "Users", "Admin", null, new {@class="btn btn-secondary ms-2"})
+            </div>
+        </div>
+    }
+</div>
+
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }

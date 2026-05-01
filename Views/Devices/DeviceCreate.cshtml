@@ -1,0 +1,235 @@
+﻿@model InzV3.Models.DeviceModel
+
+@{
+    ViewBag.Title = Model.id_device == -1 || Model.id_device == 0 ? "Dodaj urządzenie" : "Edytuj urządzenie";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .form-control, .form-select {
+        max-width: 100% !important;
+    }
+</style>
+<h2 class="text-center">@(Model.id_device == -1 || Model.id_device == 0 ? "Dodaj urządzenia" : "Edytuj urządzenie")</h2>
+@using (Html.BeginForm("ProcessCreateOne", "Devices"))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="col-xl-8 col-lg-10 mx-auto px-0">
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.brand, htmlAttributes: new { @class = "control-label fw-bold mb-1" })
+                    @Html.EditorFor(model => model.brand, new { htmlAttributes = new { @class = "form-control w-100" } })
+                    @Html.ValidationMessageFor(model => model.brand, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.model, htmlAttributes: new { @class = "control-label fw-bold mb-1" })
+                    @Html.EditorFor(model => model.model, new { htmlAttributes = new { @class = "form-control w-100" } })
+                    @Html.ValidationMessageFor(model => model.model, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.warranty, htmlAttributes: new { @class = "control-label fw-bold mb-1" })
+                    @Html.EditorFor(model => model.warranty, new { htmlAttributes = new { @class = "form-control w-100" } })
+                    @Html.ValidationMessageFor(model => model.warranty, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.id_user, htmlAttributes: new { @class = "control-label fw-bold mb-1" })
+                    @Html.DropDownListFor(model => model.id_user, (SelectList)ViewBag.Users, "Wybierz pracownika z listy", new { @class = "form-select searchable-dropdown" })
+                    @Html.ValidationMessageFor(model => model.id_user, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+
+        @Html.HiddenFor(model => model.id_device)
+        <hr class="my-4" />
+        @if (Model.id_device == -1 || Model.id_device == 0)
+        {
+            <h2 class="mb-3 mt-4 text-center">Numery seryjne</h2>
+            <hr class="my-4" />
+            <div class="form-group mb-4">
+                <div class="alert alert-info py-2 small d-inline-block">
+                    Podaj numery seryjne urządzeń.
+                </div>
+                <div id="dynamic-serials-container"></div>
+                <button type="button" id="add-serial-btn" class="btn btn-outline-primary mt-2">
+                    <strong>+ Dodaj kolejny numer seryjny</strong>
+                </button>
+                <template id="serial-template">
+                    <div class="row mt-2 align-items-center serial-row">
+                        <div class="col-md-10">
+                            <input type="text" name="serial_numbers" class="form-control w-100" placeholder="Numer seryjny" required />
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger remove-serial-btn w-100">Usuń</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <hr class="my-4" />
+            <h2 class="mb-3 mt-4 text-center">Specyfikacja techniczna</h2>
+            <hr class="my-4" />
+            <div class="form-group mb-4">
+                <label class="control-label fw-bold mb-1">Kategoria sprzętu</label>
+                @Html.DropDownList("id_category", (SelectList)ViewBag.Categories, "Wybierz kategorię", new { @class = "form-select border-primary w-100", required = "required" })
+            </div>
+            <div class="form-group mb-2">
+                <label class="control-label fw-bold mb-2">Cechy szczególne urządzenia</label>
+                <div>
+                    <div class="alert alert-info py-2 small d-inline-block">
+                        Dodaj informacje o specyfikacji oraz istotne cechy, które wyróżniają urządzenie, np. lekki.
+                    </div>
+                    <div id="dynamic-features-container"></div>
+                    <button type="button" id="add-feature-btn" class="btn btn-outline-primary mt-2">
+                        <strong>+ Dodaj następną cechę</strong>
+                    </button>
+                    <template id="feature-template">
+                        <div class="row mt-3 align-items-center feature-row">
+                            <div class="col-md-5">
+                                <select name="feature_ids" class="form-select w-100" required>
+                                    <option value="">Wybierz cechę</option>
+                                    @if (ViewBag.Features != null)
+                                    {
+                                        foreach (var f in (List<InzV3.Models.DevFeature>)ViewBag.Features)
+                                        {
+                                            <option value="@f.id_dev_feature">@f.dev_feature_name</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <input type="text" name="feature_values" class="form-control w-100" placeholder="Wartość cechy (np. 5h,1kg..)" required />
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-danger remove-feature-btn w-100">Usuń</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            <hr class="my-4" />
+            <h2 class="mb-3 mt-4 text-center">Kryteria oceny sprzętu</h2>
+            <hr class="my-4" />
+            <div class="form-group mb-4">
+                <div class="alert alert-info py-2 small d-inline-block">
+                    Podaj elementy, które będą podlegać ocenie przez użytkownika
+                </div>
+                <div id="dynamic-ratings-container"></div>
+                <button type="button" id="add-rating-btn" class="btn btn-outline-primary mt-2">
+                    <strong>+ Dodaj kryterium oceny</strong>
+                </button>
+
+                <template id="rating-template">
+                    <div class="row mt-2 align-items-center rating-row">
+                        <div class="col-md-10">
+                            <input type="text" name="rating_categories" class="form-control w-100" placeholder="Nazwa kryterium (np. Wydajność)" required />
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger remove-rating-btn w-100">Usuń</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        }
+        else
+        {
+            <h4 class="mb-3 text-primary">Identyfikacja</h4>
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.serial_num, htmlAttributes: new { @class = "control-label fw-bold mb-1" })
+                        @Html.EditorFor(model => model.serial_num, new { htmlAttributes = new { @class = "form-control w-100" } })
+                        @Html.ValidationMessageFor(model => model.serial_num, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        }
+        <hr class="my-4" />
+        <div class="form-group mb-5">
+            <input type="submit" value="Zapisz" class="btn btn-success px-4" />
+            @Html.ActionLink("Powrót do listy", "Index", null, new { @class = "btn btn-secondary ms-2 px-4" })
+        </div>
+    </div>
+    </div>
+}
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        // wyszukiwarka użytkowników
+        $(document).ready(function () {
+            $('.searchable-dropdown').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: "Wybierz pracownika z listy",
+                allowClear: true
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const container = document.getElementById("dynamic-features-container");
+            const addButton = document.getElementById("add-feature-btn");
+            const template = document.getElementById("feature-template").content;
+            if (addButton && container && template) {
+                addButton.addEventListener("click", function () {
+                    const clone = document.importNode(template, true);
+                    container.appendChild(clone);
+                });
+                container.addEventListener("click", function (e) {
+                    if (e.target && e.target.classList.contains("remove-feature-btn")) {
+                        e.target.closest(".feature-row").remove();
+                    }
+                });
+                addButton.click();// pierwsze kliknięcie na wstępie po prostu przygotuje program na pierwszy wpis
+            }
+            const serialContainer = document.getElementById("dynamic-serials-container");
+            const serialBtn = document.getElementById("add-serial-btn");
+            const serialTemplate = document.getElementById("serial-template")?.content;
+            if (serialBtn && serialContainer && serialTemplate) {
+                serialBtn.addEventListener("click", function () {
+                    const clone = document.importNode(serialTemplate, true);
+                    serialContainer.appendChild(clone);
+                });
+                serialContainer.addEventListener("click", function (e) {
+                    if (e.target && e.target.classList.contains("remove-serial-btn")) {
+                        e.target.closest(".serial-row").remove();
+                    }
+                });
+                serialBtn.click();
+            }
+            const ratingContainer = document.getElementById("dynamic-ratings-container");
+            const addRatingBtn = document.getElementById("add-rating-btn");
+            const ratingTemplate = document.getElementById("rating-template")?.content;
+            if (addRatingBtn && ratingContainer && ratingTemplate) {
+                addRatingBtn.addEventListener("click", function () {
+                    const clone = document.importNode(ratingTemplate, true);
+                    ratingContainer.appendChild(clone);
+                });
+                ratingContainer.addEventListener("click", function (e) {
+                    if (e.target && e.target.classList.contains("remove-rating-btn")) {
+                        e.target.closest(".rating-row").remove();
+                    }
+                });
+                addRatingBtn.click();
+            }
+
+
+        });
+
+    </script>
+    }

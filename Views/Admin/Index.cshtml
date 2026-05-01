@@ -1,0 +1,55 @@
+﻿
+@{
+    ViewBag.Title = "Panel Administratora";
+}
+
+<div class="mt-4">
+    <h2><i class="bi bi-shield-lock text-primary"></i>Panel Administratora</h2>
+    <hr />
+    <div class="row mt-4">
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100 border-primary">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h4 class="card-title text-primary">Zarządzanie kategoriami urządzeń</h4>
+                    <div class="mt-auto">
+                        @Html.ActionLink("Zarządzaj", "Index", "DevCategories", null, new { @class = "btn btn-primary px-4" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100 border-primary">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h4 class="card-title text-primary">Zarządzanie cechami szczególnymi</h4>
+                    <div class="mt-auto">
+                        @Html.ActionLink("Zarządzaj", "Index", "DevFeatures", null, new { @class = "btn btn-primary px-4" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100 border-primary">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h4 class="card-title text-primary">Zarządzanie kontami</h4>
+                    <div class="mt-auto">
+                        @Html.ActionLink("Zarządzaj", "Users", "Admin", null, new { @class = "btn btn-primary px-4" })
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm h-100 border-primary">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h4 class="card-title text-primary">Zarządzanie rolami</h4>
+                    <div class="mt-auto">
+                        @Html.ActionLink("Zarządzaj", "Index", "Roles", null, new { @class = "btn btn-primary px-4" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

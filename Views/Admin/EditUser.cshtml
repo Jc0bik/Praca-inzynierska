@@ -1,0 +1,35 @@
+﻿@model InzV3.Controllers.EditUserViewModel
+@{
+    ViewBag.Title = "EditUser";
+}
+
+<div class="mt-4">
+    <h2>Edytuj użytkownika</h2>
+    <hr />
+    <div class="row">
+        <div class="card shadow-sm p-4 mt-3">
+            @using (Html.BeginForm("EditUser", "Admin", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.Id)
+                <div class="mb-3">
+                    <label class="form-label text-muted">Użytkownik</label>
+                    <input type="text" class="form-control" value="@Model.FirstName @Model.LastName" disabled />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Rola</label>
+                    @Html.DropDownListFor(m => m.Role, (SelectList)ViewBag.AllRoles, "Wybierz rolę", new { @class = "form-select" })
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Funkcja</label>
+                    @Html.TextBoxFor(m => m.SubRole, new { @class = "form-control", placeholder = "Podrola (opcjonalnie)" })
+                </div>
+                <div class="mt-4 pt-2 border-top">
+                    <button type="submit" class="btn btn-success">Zapisz zmiany</button>
+                    @Html.ActionLink("Anuluj", "Users", "Admin", null, new { @class = "btn btn-secondary ms-2" })
+                </div>
+            }
+        </div>
+    </div>
+</div>

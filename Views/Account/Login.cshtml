@@ -1,0 +1,70 @@
+﻿@using InzV3.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Zaloguj";
+    ViewBag.HideNavbar = true;
+}
+
+<main aria-labelledby="title" class="d-flex justify-content-center mt-5 pt-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-header text-dark text-center py-3">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-box-arrow-in-right"></i> @ViewBag.Title</h4>
+            </div>
+
+            <div class="card-body p-4">
+                <section id="loginForm">
+                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <p class="text-muted text-center mb-4">Zaloguj się za pomocą konta lokalnego.</p>
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger small mb-3" })
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.LoginIdentifier, new { @class = "form-label fw-bold" })
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                @Html.TextBoxFor(m => m.LoginIdentifier, new { @class = "form-control" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.LoginIdentifier, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Password, new { @class = "form-label fw-bold" })
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
+                            @Html.LabelFor(m => m.RememberMe, new { @class = "form-check-label" })
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success fw-bold shadow-sm">Zaloguj</button>
+                        </div>
+
+                        @* Brak możliwości samodzielnej rejestracji *@
+                        @*<div class="mt-3 text-center">
+                                @Html.ActionLink("Zarejestruj się jako nowy użytkownik", "Register")
+                            </div>*@
+
+                        @* Włącz ten element po włączeniu potwierdzenia konta dla funkcji resetowania hasła *@
+                        @*<div class="mt-2 text-center">
+                                @Html.ActionLink("Nie pamiętasz hasła?", "ForgotPassword")
+                            </div>*@
+                    }
+                </section>
+            </div>
+        </div>
+    </div>
+</main>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

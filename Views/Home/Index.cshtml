@@ -1,0 +1,60 @@
+﻿@model InzV3.Models.ApplicationUser
+@{
+    ViewBag.Title = "Strona główna";
+    var devices = ViewBag.UserDevices as List<InzV3.Models.DeviceModel>;
+}
+
+<div class="container mt-4">
+    <h2>Witaj, @Model.FirstName!</h2>
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Twoje dane</h5>
+            <p class="card-text">
+                <strong>Imię i Nazwisko:</strong> @Model.FirstName @Model.LastName <br />
+                <strong>E-mail:</strong> @Model.Email <br />
+                <strong>Podrola:</strong> @(Model.SubRole ?? "Brak")
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        @* Sekcja Moje urządzenia *@
+        <div class="col-md-6">
+            <h3>Moje urządzenia</h3>
+            <div class="row">
+                @if (devices != null && devices.Any())
+                {
+                    foreach (var item in devices)
+                    {
+                        var category = item.Charachteristics.FirstOrDefault()?.DevCategory?.category_name ?? "Brak kategorii";
+                        <div class="col-md-12 mb-3">
+                            <div class="card h-100 shadow-sm border-primary" style="cursor:pointer;"
+                                 onclick="location.href='@Url.Action("Details", "UserDevice", new { id = item.id_device })'">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">@item.brand @item.model</h5>
+                                    <h4 class="text-primary fw-bold">@category</h4>
+                                    <p class="text-muted small">ID: @item.id_device</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">Brak przypisanych urządzeń.</p>
+                }
+            </div>
+        </div>
+
+        @* Sekcja Zgłoszenia *@
+        <div class="col-md-6">
+            <h3>Moje zgłoszenia</h3>
+            <div class="card border-info">
+                <div class="card-body">
+                    <p class="text-muted">Brak aktywnych zgłoszeń.</p>
+                    <button class="btn btn-info w-100">Utwórz nowe zgłoszenie</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
