@@ -9,6 +9,10 @@ using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Web;
 using System.Web.Mvc;
+using QRCoder;
+using System.Drawing;
+using System.IO;
+using System.Drawing.Imaging;
 
 namespace InzV3.Controllers
 {
@@ -273,6 +277,62 @@ namespace InzV3.Controllers
         {
             
             return View("Index");
+        }
+
+
+
+        // Pobieranie etykiety urządzenia
+        [HttpGet]
+        public ActionResult GetDeviceLabel(int id, bool download = false)
+        {
+            var device = context.Devices.SingleOrDefault(d => d.id_device == id);
+            if (device == null)
+            {
+                return HttpNotFound("Nie ma takiego urzązenia");
+            }
+            // generujemy adres url do szczegółów urządzenia, który będzie potem użyty do tworzenia QR kodu
+            string deviceUrl = Url.Action("Details", "Devices", new { id = device.id_device }, protocol: Request.Url.Scheme);
+
+
+            // Tworzenie Qr kodu
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode(deviceUrl, QRCodeGenerator.ECCLevel.Q);
+            QRCode qrCode = new QRCode(qrCodeData);
+
+            Bitmap qrBitmap = qrCode.GetGraphic(10);
+
+            // Dodanie id sprzętu do etykiety
+            int textPadding = 40;
+            Bitmap labelBitmap = new Bitmap(qrBitmap.Width, qrBitmap.Height + textPadding);
+            using (Graphics g = Graphics.FromImage(labelBitmap))
+            {
+                g.Clear(Color.White);
+                g.DrawImage(qrBitmap, 0, 0);
+                using (Font font = new Font("Arial", 12, FontStyle.Bold))
+                using (SolidBrush brush = new SolidBrush(Color.Black))
+                {
+                    StringFormat format = new StringFormat
+                    {
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center
+                    };
+                    RectangleF textRect = new RectangleF(0, qrBitmap.Height, labelBitmap.Width, textPadding);
+                    g.DrawString($"ID: {device.id_device}", font, brush, textRect, format);
+                }
+
+            }
+            using (MemoryStream ms = new MemoryStream())
+            {
+                labelBitmap.Save(ms, ImageFormat.Png);
+                if (download)
+                {
+                    return File(ms.ToArray(), "image/png", $"Etykieta_id_{device.id_device}.png");
+                }
+                else
+                {
+                    return File(ms.ToArray(), "image/png");
+                }
+            }
         }
     }
 }
