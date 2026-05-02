@@ -255,10 +255,10 @@ namespace InzV3.Controllers
             context.SaveChanges();
             return Redirect("/Devices");
         }
-        public ActionResult SearchFT()
-        {
-            return RedirectToAction("Index");
-        }
+        //public ActionResult SearchFT()
+        //{
+        //    return RedirectToAction("Index");
+        //}
         public ActionResult SearchName(string searchPh)
         {
             if (string.IsNullOrWhiteSpace(searchPh))
@@ -273,11 +273,11 @@ namespace InzV3.Controllers
                 //from g in context.Devices where g.brand.Contains(searchPh) select g;
             return View("Index",devices);
         }
-        public ActionResult SearchModel(string searchPh)
-        {
+        //public ActionResult SearchModel(string searchPh)
+        //{
             
-            return View("Index");
-        }
+        //    return View("Index");
+        //}
 
 
 
@@ -336,18 +336,3 @@ namespace InzV3.Controllers
         }
     }
 }
-/*
-public DeviceModel()
-{
-    id_device = -1;
-    brand = "N/a";
-    model = "N/a";
-    serial_num = -1;
-    status = "N/a";
-    features = "N/a";
-    warranty = null;
-    category = "N/a";
-    id_user = -1;
-    id_rating = -1;
-}
-*/

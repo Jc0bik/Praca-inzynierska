@@ -48,14 +48,14 @@ namespace InzV3.Controllers
             ViewBag.Roles = new SelectList(userRoles.Select(r => r.Name).ToList());
             return View(userList);
         }
-        public class UserViewModel
-        {
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public string Email { get; set; }
-            public string Role { get; set; }
-            public string SubRole { get;set; }
-        }
+        //public class UserViewModel
+        //{
+        //    public string FirstName { get; set; }
+        //    public string LastName { get; set; }
+        //    public string Email { get; set; }
+        //    public string Role { get; set; }
+        //    public string SubRole { get;set; }
+        //}
         protected override void Dispose(bool disposing)
         {
             if(disposing) context.Dispose();

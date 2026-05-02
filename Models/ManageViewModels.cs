@@ -20,10 +20,6 @@ namespace InzV3.Models
         public IList<AuthenticationDescription> OtherLogins { get; set; }
     }
 
-    public class FactorViewModel
-    {
-        public string Purpose { get; set; }
-    }
 
     public class SetPasswordViewModel
     {
@@ -56,31 +52,5 @@ namespace InzV3.Models
         [Display(Name = "Potwierdź nowe hasło")]
         [Compare("NewPassword", ErrorMessage = "Nowe hasło i potwierdzenia hasła nie są zgodne.")]
         public string ConfirmPassword { get; set; }
-    }
-
-    public class AddPhoneNumberViewModel
-    {
-        [Required]
-        [Phone]
-        [Display(Name = "Numer telefonu")]
-        public string Number { get; set; }
-    }
-
-    public class VerifyPhoneNumberViewModel
-    {
-        [Required]
-        [Display(Name = "Kod")]
-        public string Code { get; set; }
-
-        [Required]
-        [Phone]
-        [Display(Name = "Numer telefonu")]
-        public string PhoneNumber { get; set; }
-    }
-
-    public class ConfigureTwoFactorViewModel
-    {
-        public string SelectedProvider { get; set; }
-        public ICollection<System.Web.Mvc.SelectListItem> Providers { get; set; }
     }
 }
