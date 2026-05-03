@@ -255,10 +255,7 @@ namespace InzV3.Controllers
             context.SaveChanges();
             return Redirect("/Devices");
         }
-        //public ActionResult SearchFT()
-        //{
-        //    return RedirectToAction("Index");
-        //}
+
         public ActionResult SearchName(string searchPh)
         {
             if (string.IsNullOrWhiteSpace(searchPh))
@@ -270,17 +267,9 @@ namespace InzV3.Controllers
             g.id_user.ToString().Contains(searchPh) ||
             g.id_device.ToString().Contains(searchPh)
             );
-                //from g in context.Devices where g.brand.Contains(searchPh) select g;
             return View("Index",devices);
         }
-        //public ActionResult SearchModel(string searchPh)
-        //{
-            
-        //    return View("Index");
-        //}
-
-
-
+        
         // Pobieranie etykiety urządzenia
         [HttpGet]
         public ActionResult GetDeviceLabel(int id, bool download = false)

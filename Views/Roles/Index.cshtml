@@ -1,4 +1,4 @@
-﻿@model IEnumerable <Microsoft.AspNet.Identity.EntityFramework.IdentityRole>
+﻿@model IEnumerable<InzV3.Models.SubRoleModel>
 @{
     ViewBag.Title = "Zarządzanie rolami";
 }
@@ -6,56 +6,72 @@
 <div class="mt-4">
     <h2>Role w systemie</h2>
     @if (TempData["Error"] != null)
-            {
-               <div class="alert alert-danger">@TempData["Error"]</div>
-            }
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
     <p class="mt-3">
-        @Html.ActionLink("Dodaj nową rolę", "Create", null, new { @class = "btn btn-success" })
+        @Html.ActionLink("Dodaj nową podrolę", "Create", null, new { @class = "btn btn-success" })
         @Html.ActionLink("Wróć", "Index", "Admin", null, new { @class = "btn btn-secondary ms-2" })
     </p>
-    <table class="table table-striped mt-3">
+    <table class="table table-striped mt-3 align-middle">
         <thead class="table-dark">
             <tr>
-                <th>Nazwa roli</th>
+                <th>Nadrzędna rola</th>
+                <th>Nazwa podroli</th>
                 <th>Akcje</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var role in Model)
+            @foreach (var subRole in Model)
             {
                 <tr>
-                    <td class="fw-bold align-middle">@role.Name</td>
+                    <td class="fw-bold">
+                        <span class="badge bg-primary">@subRole.ParentRoleName</span>
+                    </td>
+                    <td>@subRole.Name</td>
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@role.Id">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="openDeleteModal('@subRole.Id', '@subRole.Name')">
                             Usuń
                         </button>
-                        <div class="modal fade text-start" id="deleteModal-@role.Id" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title text-danger" id="modalLabel-@role.Id">
-                                        <i>Potwierdzenie usunięcia</i>
-                                        </h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
-                                    </div>
-                                    <div class="modal-body text-start text-wrap">
-                                        <p>Usuwanie roli: <strong>@role.Name</strong></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                                        @using (Html.BeginForm("Delete", "Roles", new { id = role.Id }, FormMethod.Post, new {style = "margin: 0;"}))
-                                        {
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-danger">Usuń</button>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+<div class="modal fade text-start" id="globalDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Potwierdzenie usunięcia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Czy na pewno chcesz usunąć podrolę:<strong id="deleteCategoryName"></strong>?<br />
+                <span class="text-muted" style="font-size:0.9em;">(Ta operacja jest nieodwracalna)</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                @using (Html.BeginForm("Delete", "Roles", new { id = 0 }, FormMethod.Post, new { style = "margin: 0;" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="deleteSubRoleId" />
+                    <button type="submit" class="btn btn-danger">Tak, usuń</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        function openDeleteModal(subRoleId, subRoleName) {
+            document.getElementById('deleteSubRoleName').textContent = subRoleName;
+            document.getElementById('deleteSubRoleId').value = subRoleId;
+
+
+            var deleteModal = new bootstrap.Modal(document.getElementById('globalDeleteModal'));
+            deleteModal.show();
+        }
+    </script>
+}
 

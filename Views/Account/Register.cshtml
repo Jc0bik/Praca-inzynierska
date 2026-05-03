@@ -33,13 +33,13 @@
         <div class="form-group row mb-2">
             @Html.LabelFor(m => m.RoleName, new { @class = "col-md-3 col-form-label fw-bold text-md-end" })
             <div class="col-md-6">
-                @Html.DropDownListFor(m => m.RoleName, (SelectList)ViewBag.Roles, "Wybierz rolę", new { @class = "form-control" })
+                @Html.DropDownListFor(m => m.RoleName, (SelectList)ViewBag.Roles, "Wybierz rolę", new { @class = "form-select", id="roleSelect" })
             </div>
         </div>
         <div class="form-group row mb-2">
             @Html.LabelFor(m => m.SubRole, new { @class = "col-md-3 col-form-label fw-bold text-md-end" })
             <div class="col-md-6">
-                @Html.DropDownListFor(m => m.SubRole, (SelectList)ViewBag.SubRoles, "Brak/Pracownik Serwisu", new { @class = "form-control" })
+                @Html.DropDownListFor(m => m.SubRole, new SelectList(Enumerable.Empty <SelectListItem>()), "Wybierz rolę główną!", new { @class="form-select", id="subRoleSelect"})
                 <small class="form-text text-muted">Dotyczy tylko użytkownika z rolą "Pracownik.</small>
             </div>
         </div>
@@ -66,6 +66,43 @@
 </div>
 
 
-    @section Scripts {
-        @Scripts.Render("~/bundles/jqueryval")
+ @section Scripts {
+     <script>
+        $(document).ready(function () {
+            $('#roleSelect').change(function () {
+                var selectedRole = $(this).val();
+                var subRoleSelect = $('#subRoleSelect');
+                subRoleSelect.empty();
+
+                if (selectedRole != null && selectedRole != '') {
+                    $.getJSON('@Url.Action("GetSubRolesByRole","Admin")', { roleName: selectedRole }, function (subRoles) {
+                        if (subRoles != null && !jQuery.isEmptyObject(subRoles)) {
+                            subRoleSelect.append($('<option/>', {
+                                value: '',
+                                text: 'Wybierz podrolę'
+                            }));
+                            $.each(subRoles, function (index, subRole) {
+                                subRoleSelect.append($('<option/>', {
+                                    value: subRole.value,
+                                    text: subRole.text
+                                })).show();
+                            });
+                        }
+                        else {
+                            subRoleSelect.append($('<option/>', {
+                                value: '',
+                                text: 'Brak podroli dla tej roli'
+                            }));
+                        }
+                    });
+                }
+                else {
+                    subRoleSelect.append($('<option/>', {
+                        value: '',
+                        text: 'Wybierz rolę główną!'
+                    }))
+                }
+            });
+        });
+     </script>
     }

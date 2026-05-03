@@ -19,11 +19,11 @@
 
                 <div class="mb-3">
                     <label class="form-label fw-bold">Rola</label>
-                    @Html.DropDownListFor(m => m.Role, (SelectList)ViewBag.AllRoles, "Wybierz rolę", new { @class = "form-select" })
+                    @Html.DropDownListFor(m => m.Role, (ViewBag.AllRoles as SelectList), "Wybierz rolę", new { @class = "form-select", id = "roleSelect" })
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-bold">Funkcja</label>
-                    @Html.TextBoxFor(m => m.SubRole, new { @class = "form-control", placeholder = "Podrola (opcjonalnie)" })
+                    <label class="form-label fw-bold">Stanowisko</label>
+                    @Html.DropDownListFor(m => m.SubRole, new SelectList(Enumerable.Empty<SelectListItem>()), "Wybierz rolę główną!", new { @class = "form-select", id = "subRoleSelect" })
                 </div>
                 <div class="mt-4 pt-2 border-top">
                     <button type="submit" class="btn btn-success">Zapisz zmiany</button>
@@ -33,3 +33,46 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <script>
+       $(document).ready(function () {
+           $('#roleSelect').change(function () {
+               var selectedRole = $(this).val();
+               var subRoleSelect = $('#subRoleSelect');
+               subRoleSelect.empty();
+
+               if (selectedRole != null && selectedRole != '') {
+                   $.getJSON('@Url.Action("GetSubRolesByRole","Admin")', { roleName: selectedRole }, function (subRoles) {
+                       if (subRoles != null && !jQuery.isEmptyObject(subRoles)) {
+                           subRoleSelect.append($('<option/>', {
+                               value: '',
+                               text: 'Wybierz podrolę'
+                           }));
+                           $.each(subRoles, function (index, subRole) {
+                               subRoleSelect.append($('<option/>', {
+                                   value: subRole.value,
+                                   text: subRole.text
+                               })).show();
+                           });
+                       }
+                       else {
+                           subRoleSelect.append($('<option/>', {
+                               value: '',
+                               text: 'Brak podroli dla tej roli'
+                           }));
+                       }
+                   });
+               }
+               else {
+                   subRoleSelect.append($('<option/>', {
+                       value: '',
+                       text: 'Wybierz rolę główną!'
+                   }))
+               }
+           });
+           if ($('#roleSelect').val()) {
+               $('#roleSelect').trigger('change');
+           }
+       });
+    </script>
+}

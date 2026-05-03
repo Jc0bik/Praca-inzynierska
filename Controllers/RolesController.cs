@@ -16,51 +16,48 @@ namespace InzV3.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
         public ActionResult Index()
         {
-            var roles = db.Roles.ToList();
-            return View(roles);
+            var subRoles = db.SubRoles.OrderBy(s => s.ParentRoleName).ThenBy(s => s.Name).ToList();
+            return View(subRoles);
         }
         public ActionResult Create()
         {
+            ViewBag.ParentRoles = new SelectList(new[] { "Admin", "Pracownik Serwisu", "Użytkownik" });
             return View();
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(string roleName)
+        public ActionResult Create(SubRoleModel model)
         {
-            if (string.IsNullOrWhiteSpace(roleName))
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Nazwa roli nie może być pusta.");
-                return View();
+                if (db.SubRoles.Any(s => s.Name.ToLower() == model.Name.ToLower() && s.ParentRoleName==model.ParentRoleName))
+                {
+                    ModelState.AddModelError("", "Taka rola już istnieje!");
+                    ViewBag.ParentRoles = new SelectList(new[] {"Admin", "Pracownik Serwisu", "Użytkownik"}, model.ParentRoleName);
+                    return View(model);
+                }
+                db.SubRoles.Add(model);
+                db.SaveChanges();
+                return RedirectToAction("Index");
             }
-            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db));
-            if (roleManager.RoleExists(roleName))
-            {
-                ModelState.AddModelError("", "Ta rola już istnieje");
-                return View();
-            }
-            roleManager.Create(new IdentityRole(roleName));
-            return RedirectToAction("Index");
+            ViewBag.ParentRoles = new SelectList(new[] { "Admin", "Pracownik Serwisu", "Użytkownik" }, model.ParentRoleName);
+            return View(model);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(string id)
+        public ActionResult Delete(int id)
         {
-            var roleManager = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(db));
-            var role = roleManager.FindById(id);
-            if (role != null)
+            var subRole = db.SubRoles.Find(id);
+            if (subRole != null)
             {
                 //zabezpieczenie przed usuwaniem roli do której są przypisani użytkownicy
-                if (role.Users.Count > 0)
+                if (db.Users.Any(u => u.SubRole == subRole.Name))
                 {
-                    TempData["Error"] = "Nie można usunąć roli, ponieważ są do niej przypisani użytkownicy.";
+                    TempData["Error"] = "Nie można usunąć podroli, ponieważ są do niej przypisani użytkownicy.";
                     return RedirectToAction("Index");
                 }
-                if (role.Name == "Admin")
-                {
-                    TempData["Error"] = "Nie można usunąć roli Admin.";
-                    return RedirectToAction("Index");
-                }
-                roleManager.Delete(role);
+                db.SubRoles.Remove(subRole);
+                db.SaveChanges();
             }
             return RedirectToAction("Index");
         }

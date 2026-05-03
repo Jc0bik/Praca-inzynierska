@@ -42,16 +42,6 @@
                             </li>
                             }
                         </ul>
-                    @*@if (ViewContext.RouteData.Values["controller"].ToString() == "Devices")
-                    {
-                        using (Html.BeginForm("SearchName", "Devices", FormMethod.Get))
-                        {
-                            <div class="d-flex">
-                                <input class="form-control me-2" type="search" name="searchPh" placeholder="..." aria-label="Szukaj" />
-                                <button class="btn btn-outline-success" type="submit">Szukaj</button>
-                            </div>
-                        }
-                    }*@
                     @Html.Partial("_LoginPartial")
                 </div>
             </div>

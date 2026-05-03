@@ -215,7 +215,12 @@
     <Compile Include="Migrations\202604182305501_dodanieOprogramowania.Designer.cs">
       <DependentUpon>202604182305501_dodanieOprogramowania.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202605030025396_DodaniePodroli.cs" />
+    <Compile Include="Migrations\202605030025396_DodaniePodroli.Designer.cs">
+      <DependentUpon>202605030025396_DodaniePodroli.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\SubRoleModel.cs" />
     <Compile Include="Models\SoftwareModel.cs" />
     <Compile Include="Models\DeviceRating.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -304,8 +309,6 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\ResetPassword.cshtml" />
     <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
-    <Content Include="Views\Account\SendCode.cshtml" />
-    <Content Include="Views\Account\VerifyCode.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Manage\Index.cshtml" />
     <Content Include="Views\Manage\ManageLogins.cshtml" />
@@ -367,6 +370,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202604182305501_dodanieOprogramowania.resx">
       <DependentUpon>202604182305501_dodanieOprogramowania.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605030025396_DodaniePodroli.resx">
+      <DependentUpon>202605030025396_DodaniePodroli.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -120,6 +120,16 @@ namespace InzV3.Controllers
             }
             return RedirectToAction("Users");
         }
+        [HttpGet]
+        public JsonResult GetSubRolesByRole(string roleName)
+        {
+            var db = new ApplicationDbContext();
+            var subRoles = db.SubRoles
+                .Where(s => s.ParentRoleName == roleName)
+                .Select(s => new { value = s.Name, text = s.Name })
+                .ToList();
+            return Json(subRoles, JsonRequestBehavior.AllowGet);
+        }
     }
     public class UserListViewModel
     {

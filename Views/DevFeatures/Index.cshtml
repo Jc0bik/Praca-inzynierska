@@ -36,30 +36,9 @@
                 <tr>
                     <td class="align-middle">@Html.DisplayFor(modelItem => item.dev_feature_name)</td>
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.id_dev_feature">
+                        <button type="button" class="btn btn-danger me-1" onclick="openDeleteModal('@item.id_dev_feature', '@item.dev_feature_name')">
                             Usuń
                         </button>
-                        <div class="modal fade text-start" id="deleteModal-@item.id_dev_feature" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Potwierdzenie usunięcia</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Usuwanie cechy: <strong>@item.dev_feature_name</strong></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                                        @using (Html.BeginForm("Delete", "DevFeatures", new { id = item.id_dev_feature }, FormMethod.Post))
-                                        {
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-danger">Usuń</button>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                     </td>
                 </tr>
@@ -67,3 +46,41 @@
         </tbody>
     </table>
 </div>
+<div class="modal fade text-start" id="globalDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Potwierdzenie usunięcia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Czy na pewno chcesz usunąć cechę:<strong id="deleteFName"></strong>?<br />
+                <span class="text-muted" style="font-size:0.9em;">(Ta operacja jest nieodwracalna)</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                @using (Html.BeginForm("Delete", "DevFeatures", new { id = 0 }, FormMethod.Post, new { style = "margin: 0;" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="deleteFId" />
+                    <button type="submit" class="btn btn-danger">Tak, usuń</button>
+                })
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        function openDeleteModal(featureId, featureName) {
+            document.getElementById('deleteFName').textContent = featureName;
+
+
+            var deleteUrl = '@Url.Action("Delete", "DevFeatures")' + '/' + featureId;
+            document.getElementById('confirmDeleteBtn').href = deleteUrl;
+
+
+            var deleteModal = new bootstrap.Modal(document.getElementById('globalDeleteModal'));
+            deleteModal.show();
+        }
+    </script>
+}    

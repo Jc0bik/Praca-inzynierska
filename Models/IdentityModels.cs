@@ -31,6 +31,8 @@ namespace InzV3.Models
         public DbSet<DevFeature> DevFeatures { get; set; }
         public DbSet<DeviceRating> DeviceRating { get; set; }
 
+        public DbSet<SubRoleModel> SubRoles { get; set; }
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

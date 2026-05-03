@@ -38,30 +38,30 @@
                 <tr>
                     <td class="align-middle">@Html.DisplayFor(modelItem => item.category_name)</td>
                     <td>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal-@item.id_category">
+                        <button type="button" class="btn btn-danger me-1" onclick="openDeleteModal('@item.id_category', '@item.category_name')">
                             Usuń
                         </button>
-                        <div class="modal fade text-start" id="deleteModal-@item.id_category" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Potwierdzenie usunięcia</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Usuwanie kategorii: <strong>@item.category_name</strong></p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                                        @using (Html.BeginForm("Delete", "DevCategories", new { id = item.id_category }, FormMethod.Post))
-                                        {
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-danger">Usuń</button>
-                                        }
+                        @*<div class="modal fade text-start" id="deleteModal-@item.id_category" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Potwierdzenie usunięcia</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zamknij"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Usuwanie kategorii: <strong>@item.category_name</strong></p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                                            @using (Html.BeginForm("Delete", "DevCategories", new { id = item.id_category }, FormMethod.Post))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-danger">Usuń</button>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            </div>*@
 
                     </td>
                 </tr>
@@ -69,3 +69,41 @@
         </tbody>
     </table>
 </div>
+<div class="modal fade text-start" id="globalDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Potwierdzenie usunięcia</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Czy na pewno chcesz usunąć kategorię:<strong id="deleteCategoryName"></strong>?<br />
+                <span class="text-muted" style="font-size:0.9em;">(Ta operacja jest nieodwracalna)</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                @using (Html.BeginForm("Delete", "DevCategories", new { id = 0 }, FormMethod.Post, new { style="margin: 0;" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="deleteCategoryId"/>
+                    <button type="submit" class="btn btn-danger">Tak, usuń</button>
+                })
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        function openDeleteModal(categoryId, categoryName) {
+            document.getElementById('deleteCategoryName').textContent = categoryName;
+
+
+            var deleteUrl = '@Url.Action("Delete", "DevCategories")' + '/' + categoryId;
+            document.getElementById('confirmDeleteBtn').href = deleteUrl;
+
+
+            var deleteModal = new bootstrap.Modal(document.getElementById('globalDeleteModal'));
+            deleteModal.show();
+        }
+    </script>
+}    
