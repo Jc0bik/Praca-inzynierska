@@ -16,7 +16,7 @@ namespace InzV3.Controllers
             return new List<string> { "System operacyjny", "Oprogramowanie", "Subskrybcja" };
         }
         // GET: Software
-        public ActionResult Index(string searchName, string searchSerial, string categoryFilter, string statusFilter, string sortOrder)
+        public ActionResult Index(string searchName, string searchSerial, string categoryFilter, string statusFilter, string sortOrder, string expireFilter)
         {
             var software = db.Software.Include(s => s.id_device).AsQueryable();
 
@@ -41,6 +41,21 @@ namespace InzV3.Controllers
             {
                 software = software.Where(s => s.assigned_device != null);
             }
+
+            // Filtr do monitorowanial licencji bliskich wygaśnięciu
+            if (!String.IsNullOrEmpty(expireFilter))
+            {
+                var today =DateTime.Today;
+                var twoMonths=today.AddMonths(2);
+                if (expireFilter=="Bliski koniec")
+                {
+                    software = software.Where(s => s.license_end_date.HasValue && s.license_end_date.Value >= today && s.license_end_date.Value <= twoMonths);
+                }
+                else if (expireFilter == "Licencja wygasła")
+                {
+                    software = software.Where(s => s.license_end_date.HasValue && s.license_end_date.Value < today);
+                }
+            }
             switch (sortOrder)
             {
                 case "date_ascending":
@@ -55,6 +70,7 @@ namespace InzV3.Controllers
             }
             ViewBag.Categories = new SelectList(GetCategories());
             ViewBag.CurrentSort = sortOrder;
+            ViewBag.CurrentExpireFilter = expireFilter;
             return View(software.ToList());
         }
         [HttpGet]

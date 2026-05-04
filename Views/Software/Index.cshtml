@@ -2,6 +2,16 @@
 @model IEnumerable<InzV3.Models.SoftwareModel>
 @{
     ViewBag.Title = "Index";
+    Func<DateTime?, string> GetStatusColor = (endDate) =>
+    {
+        if (!endDate.HasValue)
+            return "";
+        var today = DateTime.Today;
+        var date = endDate.Value.Date;
+        if (date < today) return "text-danger fw-bold";
+        if (date <= today.AddMonths(2)) return "text-warning fw-bold";
+        return "";
+    };
 }
 
 <h2 class="mb-4">Oprogramowanie</h2>
@@ -9,19 +19,19 @@
     <div class="card-body">
         @using (Html.BeginForm("Index", "Software", FormMethod.Get, new { @class = "row g-3 align-items-end" }))
         {
-            <div class="col-md-2">
+            <div class="col-md-auto">
                 <label class="form-label">Nazwa</label>
                 @Html.TextBox("searchName", null, null, new { @class = "form-control" })
             </div>
-            <div class="col-md-2">
+            <div class="col-md-auto">
                 <label class="form-label">Numer seryjny</label>
                 @Html.TextBox("searchSerial", null, null, new { @class = "form-control" })
             </div>
-            <div class="col-md-2">
+            <div class="col-md-auto">
                 <label class="form-label">Kategoria</label>
                 @Html.DropDownList("categoryFilter", ViewBag.Categories as SelectList, "Wszystkie", new { @class = "form-select" })
             </div>
-            <div class="col-md-2">
+            <div class="col-md-auto">
                 <label class="form-label">Status</label>
                 <select name="statusFilter" class="form-select">
                     <option value="">Wszystkie</option>
@@ -29,7 +39,7 @@
                     <option value="Przypisane">Przypisane</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-auto">
                 <label class="form-label">Data</label>
                 <select name="sortOrder" class="form-select">
                     <option value="">Domyślne sortowanie</option>
@@ -37,7 +47,15 @@
                     <option value="date_desc">Najdalej końca</option>
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-auto">
+                <label class="form-label">Ważność licencji  </label>
+                <select name="expireFilter" class="form-select">
+                    <option value="">Wszystko</option>
+                    <option value="Bliski koniec" @(ViewBag.CurrentExpireFilter == "Bliski koniec" ? "selected" : "")>Licencje bliskie wygaśnięciu</option>
+                    <option value="Licencja wygasła" @(ViewBag.CurrentExpireFilter == "Licencja wygasła" ? "selected" : "")>Licencje wygasłe</option>
+                </select>
+            </div>
+            <div class="col-md-auto">
                 <button type="submit" class="btn btn-warning w-100">Szukaj</button>
             </div>
         }
@@ -64,7 +82,9 @@
                 <td><strong>@item.software_name</strong></td>
                 <td>@item.software_category</td>
                 <td>
-                    @(item.license_end_date.HasValue ? item.license_end_date.Value.ToString("yyyy-MM-dd") : "Lifetime")
+                    <span class="@GetStatusColor(item.license_end_date)">
+                        @(item.license_end_date.HasValue ? item.license_end_date.Value.ToShortDateString() : "Bezterminowa")
+                    </span>
                 </td>
                 <td>
                     @if (item.assigned_device.HasValue)

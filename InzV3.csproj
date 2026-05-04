@@ -183,6 +183,7 @@
     <Compile Include="Controllers\RolesController.cs" />
     <Compile Include="Controllers\ServiceController.cs" />
     <Compile Include="Controllers\SoftwareController.cs" />
+    <Compile Include="Controllers\TicketsController.cs" />
     <Compile Include="Controllers\UserDeviceController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -219,7 +220,13 @@
     <Compile Include="Migrations\202605030025396_DodaniePodroli.Designer.cs">
       <DependentUpon>202605030025396_DodaniePodroli.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202605032008079_DodanieZgloszen.cs" />
+    <Compile Include="Migrations\202605032008079_DodanieZgloszen.Designer.cs">
+      <DependentUpon>202605032008079_DodanieZgloszen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\TicketMessageModel.cs" />
+    <Compile Include="Models\TicketModel.cs" />
     <Compile Include="Models\SubRoleModel.cs" />
     <Compile Include="Models\SoftwareModel.cs" />
     <Compile Include="Models\DeviceRating.cs" />
@@ -336,6 +343,9 @@
     <Content Include="Views\UserDevice\Index.cshtml" />
     <Content Include="Views\UserDevice\Details.cshtml" />
     <Content Include="Views\Home\MyDevices.cshtml" />
+    <Content Include="Views\Tickets\MyTickets.cshtml" />
+    <Content Include="Views\Tickets\ManageTickets.cshtml" />
+    <Content Include="Views\Tickets\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -373,6 +383,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202605030025396_DodaniePodroli.resx">
       <DependentUpon>202605030025396_DodaniePodroli.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605032008079_DodanieZgloszen.resx">
+      <DependentUpon>202605032008079_DodanieZgloszen.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

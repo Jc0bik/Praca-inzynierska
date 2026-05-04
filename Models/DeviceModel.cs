@@ -29,6 +29,8 @@ namespace InzV3.Models
         public string status { get; set; }
         [Required]
         [DisplayName("Data końcowa gwarancji")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime? warranty { get; set; }
         [DisplayName("Przypisany użytkownik")]
         public string id_user { get; set; }

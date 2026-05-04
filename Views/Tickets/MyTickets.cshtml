@@ -1,0 +1,77 @@
+﻿
+@model IEnumerable<InzV3.Models.TicketModel>
+@{
+    ViewBag.Title = "Moje zgłoszenia";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-ticket-detailed text-primary"></i> Moje zgłoszenia</h2>
+        <a class="btn btn-secondary" href="@Url.Action("Index","Home")">Powrót</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+        }
+    <div class="card shadow-sm border-primary">
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Data zgłoszenia</th>
+                        <th>Urządzenie</th>
+                        <th>Status</th>
+                        <th>Opiekun</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var item in Model) 
+                    { 
+                        <tr>
+                            <td>#@item.id_ticket</td>
+                            <td>@item.createdAt.ToString("dd.MM.yyyy")</td>
+                            <td>@item.Device.brand @item.Device.model</td>
+                            <td>
+                                @if (item.status == InzV3.Models.TicketStatuses.Zamkniete)
+                                {
+                                    <span class="badge bg-secondary">@item.status</span>
+                                }
+                                else if (item.status == InzV3.Models.TicketStatuses.OczekujeSerwis)
+                                {
+                                    <span class="badge bg-warning text-dark">@item.status</span>
+                                }
+                                else if (item.status == InzV3.Models.TicketStatuses.WRealizacji)
+                                {
+                                    <span class="badge bg-primary">@item.status</span>
+                                }
+                                else
+                                { 
+                                    <span class="badge bg-info text-dark">@item.status</span>
+                                }
+                            </td>
+                            <td>
+                                @(item.Technician!=null ? item.Technician.FirstName+" " + item.Technician.LastName: "Nieprzypisano")
+                            </td>
+                            <td>
+                                <a href="@Url.Action("Details", "Tickets", new { id = item.id_ticket })" class="btn btn-sm btn-primary">Szczegóły</a>
+                            </td>
+                        </tr>
+                     }
+                    @if (!Model.Any()) 
+                    { 
+                        <tr>
+                            <td colspan="6" class="text-center text-muted p-4">
+                                Brak zgłoszeń
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

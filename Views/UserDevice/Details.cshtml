@@ -6,6 +6,16 @@
     var ratings = ViewBag.Ratings as List<InzV3.Models.DeviceRating>;
     var currentUserId = User.Identity.GetUserId();
     Layout = "~/Views/Shared/_Layout.cshtml";
+    Func<DateTime?, string> GetStatusColor = (endDate) =>
+    {
+        if (!endDate.HasValue)
+            return "";
+        var today = DateTime.Today;
+        var date = endDate.Value.Date;
+        if (date < today) return "text-danger fw-bold";
+        if (date <= today.AddMonths(2)) return "text-warning fw-bold";
+        return "";
+    };
 }
 <h2 class="text-center">@ViewBag.Title</h2>
 
@@ -25,10 +35,14 @@
                     <dd class="col-sm-7">@Model.serial_num</dd>
 
                     <dt class="col-sm-5">Koniec gwarancji</dt>
-                    <dd class="col-sm-7">@(Model.warranty.HasValue ? Model.warranty.Value.ToShortDateString(): "Brak danych")</dd>
+                    <dd class="col-sm-7">
+                        <span class="@GetStatusColor(Model.warranty)">
+                            @(Model.warranty.HasValue ? Model.warranty.Value.ToShortDateString(): "Brak danych")
+                        </span>
+                    </dd>
                 </dl>
 
-                
+
             </div>
         </div>
         <div class="card">
@@ -53,7 +67,7 @@
             </div>
         </div>
     </div>
-    <div class="col=md-6">
+    <div class="col-md-6">
         <div class="card">
             <div class="card-header"><h5>Przypisane oprogramowanie</h5></div>
             <div class="card-body">
@@ -72,7 +86,11 @@
                             {
                                 <tr>
                                     <td>@s.software_name</td>
-                                    <td>@(s.license_end_date.HasValue ? s.license_end_date.Value.ToShortDateString() : "Bezterminowa")</td>
+                                    <td>
+                                        <span class="@GetStatusColor(s.license_end_date)">
+                                            @(s.license_end_date.HasValue ? s.license_end_date.Value.ToShortDateString() : "Bezterminowa")
+                                        </span>
+                                    </td>
                                     <td>@(string.IsNullOrEmpty(s.software_serial_number) ? "Brak" : s.software_serial_number)</td>
                                 </tr>
                             }
@@ -86,9 +104,36 @@
             </div>
         </div>
     </div>
+
 </div>
-
-
+<button class=" btn btn-danger btn-lg w-100 mb-3 mt-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#ticketModal">
+    <i class="bi bi-exclamation-triangle"></i> Zgóś problem ze sprzętem
+</button>
+<div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @using (Html.BeginForm("Create", "Tickets", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id_device" value="@Model.id_device" />
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Zgłoś problem ze sprzętem: @Model.brand @Model.model</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Krótki opis problemu</label>
+                        <textarea class="form-control" name="description" rows="4" required placeholder="Opisz problem sprzętu:"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
+                    <button type="submit" class="btn btn-danger">Wyślij</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
 @*POPRAWIĆ TO*@
 <div class="modal fade" id="ratingModal" tabindex="-1" aria-hidden="true">
@@ -96,7 +141,8 @@
         <div class="modal-content">
             @using (Html.BeginForm("SaveRatings", "UserDevice", FormMethod.Post))
             {
-                @Html.AntiForgeryToken() <input type="hidden" name="id_device" value="@Model.id_device" />
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id_device" value="@Model.id_device" />
                 <div class="modal-header">
                     <h5 class="modal-title">Oceń parametry sprzętu</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

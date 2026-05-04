@@ -6,6 +6,16 @@
     var ratings = ViewBag.Ratings as List<InzV3.Models.DeviceRating>;
     var currentUserId = User.Identity.GetUserId();
     Layout = "~/Views/Shared/_Layout.cshtml";
+    Func<DateTime?, string> GetStatusColor = (endDate) =>
+    {
+        if (!endDate.HasValue)
+            return "";
+        var today = DateTime.Today;
+        var date = endDate.Value.Date;
+        if (date < today) return "text-danger fw-bold";
+        if (date <= today.AddMonths(2)) return "text-warning fw-bold";
+        return "";
+    };
 }
 <h2 class="text-center mb-4">@ViewBag.Title</h2>
 
@@ -25,10 +35,14 @@
                     <dd class="col-sm-7">@Model.serial_num</dd>
 
                     <dt class="col-sm-5">Koniec gwarancji</dt>
-                    <dd class="col-sm-7">@(Model.warranty.HasValue ? Model.warranty.Value.ToShortDateString(): "Brak danych")</dd>
+                    <dd class="col-sm-7">
+                        <span class="@GetStatusColor(Model.warranty)">
+                            @(Model.warranty.HasValue ? Model.warranty.Value.ToShortDateString(): "Brak danych")
+                        </span>
+                    </dd>
                 </dl>
 
-                
+
             </div>
         </div>
         <div class="card mb-4 shadow-sm">
@@ -70,7 +84,11 @@
                             {
                                 <tr>
                                     <td>@s.software_name</td>
-                                    <td>@(s.license_end_date.HasValue ? s.license_end_date.Value.ToShortDateString() : "Bezterminowa")</td>
+                                    <td> 
+                                        <span class="@GetStatusColor(s.license_end_date)">
+                                            @(s.license_end_date.HasValue ? s.license_end_date.Value.ToShortDateString() : "Bezterminowa")
+                                        </span>
+                                    </td>
                                     <td>@(string.IsNullOrEmpty(s.software_serial_number) ? "Brak" : s.software_serial_number)</td>
                                 </tr>
                             }
@@ -84,7 +102,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-4">
         <div class="card shadow-sm border primary">
             <div class="card-header bg-primary text-white text-center">
@@ -94,9 +112,10 @@
                 <img src="@Url.Action("GetDeviceLabel", "Devices", new { id = Model.id_device, download = false })"
                      alt="Kod QR"
                      class="img-fluid border p-2 rounded mb-3 bg-white"
-                     style="max-width: 220px"/>
+                     style="max-width: 220px" />
                 <a class="btn btn-primary w-100 fw-bold" href="@Url.Action("GetDeviceLabel", "Devices", new { id = Model.id_device, download = true })">
-                    <i class="bi bi-download me-2"></i> Pobierz etykietę</a>
+                    <i class="bi bi-download me-2"></i> Pobierz etykietę
+                </a>
             </div>
         </div>
     </div>

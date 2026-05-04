@@ -29,9 +29,9 @@
 
         @* Sekcja Zgłoszenia *@
         <div class="col-md-6">
-            <div class="card border-primary h-100 shadow-sm">
+            <div class="card border-primary h-100 shadow-sm" style="cursor:pointer; transition:0.3s;" onclick="location.href='@Url.Action("MyTickets","Tickets")'" onmouseover="this.classList.add('bg-light')" onmouseout="this.classList.remove('bh-light')">
                 <div class="card-body text-center d-flex flex-column justify-content-center py-4">
-                    <h3 class="card-title text-primary fw-bold mb-2"><i class="bi bi-laptop"></i> Moje zgłoszenia</h3>
+                    <h3 class="card-title text-primary fw-bold mb-2"><i class="bi bi-ticket-detailed"></i>Moje zgłoszenia</h3>
                 </div>
             </div>
         </div>

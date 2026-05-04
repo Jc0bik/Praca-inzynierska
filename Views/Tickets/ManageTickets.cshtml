@@ -1,0 +1,76 @@
+﻿@model IEnumerable<InzV3.Models.TicketModel>
+@{
+    ViewBag.Title = "Zarządzanie zgłoszeniami";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="mt-4">
+    <h2><i class="bi bi-ticket-detailed text-warning"></i> Zarządzanie zgłoszeniami</h2>
+    <hr />
+
+    <div class="card bg-light p-3 mb-4 shadow-sm border-warning">
+        <form method="get" action="@Url.Action("ManageTickets", "Tickets")">
+           <div class="row g-2 align-items-center">
+               <div class="col-md-4">
+                   <label class="form-label small">Przypisanie</label>
+                   <select name="assignFilter" class="form-select">
+                       <option value="Wszystkie" @(ViewBag.CurrentFilter == "Wszystkie" ? "selected": "")>Wszystkie</option>
+                       <option value="Nieprzypisane" @(ViewBag.CurrentFilter == "Nieprzypisane" ? "selected": "")>Nieprzypisane</option>
+                       <option value="Przypisane do innych" @(ViewBag.CurrentFilter == "Przypisane do innych" ? "selected": "")>Przypisane do innych</option>
+                       <option value="Przypisane do mnie" @(ViewBag.CurrentFilter == "Moje" ? "selected": "")>Przypisane do mnie</option>
+                   </select>
+               </div>
+               <div class="col-md-4">
+                   <label class="form-label small">Sortowanie po dacie</label>
+                   <select name="sortOrder" class="form-select">
+                       <option value="Newest" @(ViewBag.CurrentSort == "Newest" ? "selected" : "")>Najnowsze</option>
+                       <option value="Oldest" @(ViewBag.CurrentSort == "Oldest" ? "selected" : "")>Najstarsze</option>
+                   </select>
+               </div>
+               <div class="col-md-4 d-flex align-items-end">
+                   <button type="submit" class="btn btn-warning w-100 me-2">Filtruj</button>
+                   <a href="@Url.Action("Index","Service")" class="btn btn-secondary w-100">Powrót</a>
+               </div>
+           </div>
+        </form>
+    </div>
+    <table class="table table-hover align-middle border shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Data</th>
+                <th>Zgłaszający</th>
+                <th>ID i nazwa sprzętu</th>
+                <th>Opiekun</th>
+                <th>Status</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>#@item.id_ticket</td>
+                    <td>@item.createdAt.ToString("dd.MM.yyyy")</td>
+                    <td>@item.User.FirstName @item.User.LastName</td>
+                    <td><span class="badge bg-secondary">ID: @item.id_device</span> @item.Device.brand @item.Device.model</td>
+                    <td>
+                        @if (item.id_technician != null)
+                        {
+                            <span class="text-success fw-bold">@item.Technician.FirstName @item.Technician.LastName</span>
+                        }
+                        else
+                        {
+                            <span class="text-danger fw-bold">Brak</span>
+                        }
+                    </td>
+                    <td><strong>@item.status</strong></td>
+                    <td>
+                        <a href="@Url.Action("Details", "Tickets", new { id = item.id_ticket })" class="btn btn-sm btn-warning">Szczegóły</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

@@ -30,14 +30,33 @@ namespace InzV3.Models
         public DbSet<DevCharacteristic> DevCharacteristics { get; set; }
         public DbSet<DevFeature> DevFeatures { get; set; }
         public DbSet<DeviceRating> DeviceRating { get; set; }
-
         public DbSet<SubRoleModel> SubRoles { get; set; }
+        public DbSet<TicketModel> Tickets { get; set; }
+        public DbSet<TicketMessageModel> TicketMessages { get; set; }
 
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
         }
-
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity <TicketModel>()
+                .HasRequired(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.id_user)
+                .WillCascadeOnDelete(false);
+            modelBuilder .Entity<TicketModel>()
+                .HasOptional(t => t.Technician)
+                .WithMany()
+                .HasForeignKey(t => t.id_technician)
+                .WillCascadeOnDelete(false);
+            modelBuilder.Entity<TicketMessageModel>()
+                .HasRequired(m => m.Sender)
+                .WithMany()
+                .HasForeignKey(m => m.id_sender)
+                .WillCascadeOnDelete(false);
+        }
         public static ApplicationDbContext Create()
         {
             return new ApplicationDbContext();

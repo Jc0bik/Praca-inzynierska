@@ -45,7 +45,7 @@
                 <div class="card-body text-center d-flex flex-column justify-content-center">
                     <h4 class="card-title text-warning">Zgłoszenia</h4>
                     <div class="mt-auto">
-                        <button class="btn btn-warning px-4" disabled>Wkrótce...</button>
+                        @Html.ActionLink("Zarządzaj", "ManageTickets", "Tickets", null, new { @class = "btn btn-warning px-4" })
                     </div>
                 </div>
             </div>
