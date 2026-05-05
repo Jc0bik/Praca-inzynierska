@@ -18,13 +18,13 @@
     };
 }
 <h2 class="text-center">@ViewBag.Title</h2>
-
-<div class="row">
-    <div class="col-md-6">
+<hr/>
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
         <div class="card mb-4">
-            <div class="card-header"><h5>Informacje o sprzęcie</h5></div>
+            <div class="card-header bg-light"><h5 class="mb-0">Informacje o sprzęcie</h5></div>
             <div class="card-body">
-                <dl class="row">
+                <dl class="row mb-0">
                     <dt class="col-sm-5"> Id urządzenia</dt>
                     <dd class="col-sm-7">@Model.id_device</dd>
 
@@ -35,7 +35,7 @@
                     <dd class="col-sm-7">@Model.serial_num</dd>
 
                     <dt class="col-sm-5">Koniec gwarancji</dt>
-                    <dd class="col-sm-7">
+                    <dd class="col-sm-7 mb-0">
                         <span class="@GetStatusColor(Model.warranty)">
                             @(Model.warranty.HasValue ? Model.warranty.Value.ToShortDateString(): "Brak danych")
                         </span>
@@ -45,8 +45,8 @@
 
             </div>
         </div>
-        <div class="card">
-            <div class="card-header"><h5>Obecne oceny</h5></div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light"><h5 class="mb-0">Obecne oceny</h5></div>
             <div class="card-body">
                 @if (ratings != null && ratings.Any())
                 {
@@ -66,15 +66,13 @@
                 }
             </div>
         </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header"><h5>Przypisane oprogramowanie</h5></div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light"><h5 class="mb-0">Przypisane oprogramowanie</h5></div>
             <div class="card-body">
                 @if (software != null && software.Any())
                 {
-                    <table class="table table-sm">
-                        <thead>
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light">
                             <tr>
                                 <th>Nazwa</th>
                                 <th>Data ważności</th>
@@ -103,12 +101,16 @@
                 }
             </div>
         </div>
+        <button class=" btn btn-danger btn-lg w-100 mb-3 mt-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#ticketModal">
+            <i class="bi bi-exclamation-triangle"></i> Zgłoś problem ze sprzętem
+        </button>
+        <p class="mt-3">
+            <a class="btn btn-secondary" href="@Url.Action("Index", "Home")">Powrót do strony głównej</a>
+        </p>
     </div>
 
 </div>
-<button class=" btn btn-danger btn-lg w-100 mb-3 mt-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#ticketModal">
-    <i class="bi bi-exclamation-triangle"></i> Zgóś problem ze sprzętem
-</button>
+
 <div class="modal fade" id="ticketModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -135,14 +137,13 @@
     </div>
 </div>
 
-@*POPRAWIĆ TO*@
+
 <div class="modal fade" id="ratingModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             @using (Html.BeginForm("SaveRatings", "UserDevice", FormMethod.Post))
             {
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id_device" value="@Model.id_device" />
+                @Html.AntiForgeryToken() <input type="hidden" name="id_device" value="@Model.id_device" />
                 <div class="modal-header">
                     <h5 class="modal-title">Oceń parametry sprzętu</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -150,12 +151,32 @@
                 <div class="modal-body">
                     @foreach (var r in ratings)
                     {
-                        <div class="mb-3">
-                            <label class="form-label">@r.category_name (Obecnie: @r.rating_value)</label>
-                            <input type="range" class="form-range" name="rating_@r.id_rating" min="1" max="5" step="1" value="@r.rating_value">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                                <span>@r.category_name</span>
+                                <span class="badge bg-primary text-white">Ocena: <span id="val_@r.id_rating">@r.rating_value</span>/5</span>
+                            </label>
+                            <div class="d-flex  align-items-center mt-2">
+                                <span class="text-danger small fw-semibold me-3" style="white-space: nowrap;" >
+                                    Oceniam źle
+                                </span>
+
+                                <input type="range" class="form-range flex-grow-1"
+                                       name="rating_@r.id_rating"
+                                       min="1"
+                                       max="5"
+                                       step="1"
+                                       value="@r.rating_value"
+                                       oninput="document.getElementById('val_@r.id_rating').innerText=this.value">
+                                <span class="text-success small fw-semibold ms-3" style="white-space: nowrap;">
+                                    Oceniam dobrze
+                                </span>
+                            </div>
                         </div>
                     }
                 </div>
+
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
                     <button type="submit" class="btn btn-success">Zapisz oceny</button>
@@ -165,6 +186,25 @@
     </div>
 </div>
 
-<p class="mt-3">
-    <a class="btn btn-outline-secondary" href="@Url.Action("Index", "Home")">Powrót do strony głównej</a>
-</p>
+@*Wymuszanie ocenienia sprzętu*@
+@section Scripts
+    {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var forceRating = '@(ViewBag.ForceRating == true ? "true" : "false")' === 'true';
+            if (forceRating) {
+                var modalEl = document.getElementById('ratingModal');
+                var ratingModal = new bootstrap.Modal(modalEl, {
+                    backdrop: 'static',
+                    keyboard: false
+                });
+                var closeBtns = modalEl.querySelectorAll('.btn-close, .btn-secondary');
+                closeBtns.forEach(function (btn) {
+                    btn.style.display = 'none';
+                });
+                ratingModal.show();
+            }
+        });
+    </script>
+
+    }

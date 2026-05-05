@@ -1,13 +1,14 @@
 ﻿using InzV3.Models;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace InzV3.Controllers
 {
@@ -23,7 +24,7 @@ namespace InzV3.Controllers
         public ActionResult Users(string searchString, string roleFilter)
         {
             var usersQuery = db.Users.AsQueryable();
-            var userRoles = db.Roles.ToList();
+            
 
             //wyszukiwanie użytkowników z listy
             if (!string.IsNullOrEmpty(searchString))
@@ -34,7 +35,10 @@ namespace InzV3.Controllers
                     u.LastName.ToLower().Contains(searchString) ||
                     u.Email.ToLower().Contains(searchString));
             }
-            var userList = usersQuery.ToList().Select(u => new UserListViewModel
+            var filteredUsers = usersQuery.ToList();
+            // AsnoTracking dla zwiekszenia wydajości, czyli samo odczytanie
+            var userRoles = db.Roles.AsNoTracking().ToList();
+            var userList = filteredUsers.Select(u => new UserListViewModel
             {
                 Id = u.Id,
                 FirstName = u.FirstName,
@@ -43,6 +47,7 @@ namespace InzV3.Controllers
                 Role = userRoles.FirstOrDefault(r => r.Id == u.Roles?.FirstOrDefault()?.RoleId)?.Name ?? "Brak",
                 SubRole = u.SubRole
             }).ToList();
+
             if (!string.IsNullOrEmpty(roleFilter))
             {
                 userList = userList.Where(u => u.Role == roleFilter).ToList();

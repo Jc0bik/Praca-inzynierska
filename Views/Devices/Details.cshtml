@@ -40,6 +40,14 @@
                             @(Model.warranty.HasValue ? Model.warranty.Value.ToShortDateString(): "Brak danych")
                         </span>
                     </dd>
+                    <dt class="col-sm-5">Ostatnia ocena sprzętu</dt>
+                    <dd class="col-sm-7">
+                        @(ViewBag.LastRatingDate != null ? ((DateTime)ViewBag.LastRatingDate).ToShortDateString() : "Nigdy nie oceniano")
+                    </dd>
+                    <dt class="col-sm-5">Następna ocena sprzętu</dt>
+                    <dd class="col-sm-7">
+                        @(ViewBag.NextRatingDate != null ? ((DateTime)ViewBag.NextRatingDate).ToShortDateString() : "Dziś")
+                    </dd>
                 </dl>
 
 
@@ -84,7 +92,7 @@
                             {
                                 <tr>
                                     <td>@s.software_name</td>
-                                    <td> 
+                                    <td>
                                         <span class="@GetStatusColor(s.license_end_date)">
                                             @(s.license_end_date.HasValue ? s.license_end_date.Value.ToShortDateString() : "Bezterminowa")
                                         </span>
@@ -122,7 +130,11 @@
 </div>
 
 
+
+
 @*POPRAWIĆ TO*@
+
+
 <div class="modal fade" id="ratingModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -133,15 +145,37 @@
                     <h5 class="modal-title">Oceń parametry sprzętu</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
+                // Dobrze
                 <div class="modal-body">
                     @foreach (var r in ratings)
                     {
-                        <div class="mb-3">
-                            <label class="form-label">@r.category_name (Obecnie: @r.rating_value)</label>
-                            <input type="range" class="form-range" name="rating_@r.id_rating" min="1" max="5" step="1" value="@r.rating_value">
+                        <div class="mb-4">
+                            <label class="form-label fw-bold d-flex justify-content-between align-items-center">
+                                <span>@r.category_name</span>
+                                <span class="badge bg-primary text-white">Ocena: <span id="val_@r.id_rating">@r.rating_value</span>/5</span>
+                            </label>
+                            <div class="d-flex  align-items-center mt-2">
+                                <span class="text-danger small fw-semibold me-3" style="white-space: nowrap;">
+                                    Oceniam źle
+                                </span>
+
+                                <input type="range" class="form-range flex-grow-1"
+                                       name="rating_@r.id_rating"
+                                       min="1"
+                                       max="5"
+                                       step="1"
+                                       value="@r.rating_value"
+                                       oninput="document.getElementById('val_@r.id_rating').innerText=this.value">
+                                <span class="text-success small fw-semibold ms-3" style="white-space: nowrap;">
+                                    Oceniam dobrze
+                                </span>
+                            </div>
                         </div>
                     }
                 </div>
+
+
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
                     <button type="submit" class="btn btn-success">Zapisz oceny</button>
@@ -150,6 +184,7 @@
         </div>
     </div>
 </div>
+
 
 <p class="mt-3">
     <a class="btn btn-outline-secondary" href="@Url.Action("Index", "Home")">Powrót do strony głównej</a>

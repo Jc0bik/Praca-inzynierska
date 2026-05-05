@@ -16,5 +16,8 @@ namespace InzV3.Models
         [Required]  
         [DisplayName("Rola nadrzedna")]
         public string ParentRoleName { get; set; }
+        [Required]
+        [DisplayName("Interwał wymuszenia ocen (liczony w dniach)")]
+        public int RatingIntervalDays { get; set; } = 30;
     }
 }

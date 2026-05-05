@@ -224,6 +224,10 @@
     <Compile Include="Migrations\202605032008079_DodanieZgloszen.Designer.cs">
       <DependentUpon>202605032008079_DodanieZgloszen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202605042209131_DodanieInterwaluOcen.cs" />
+    <Compile Include="Migrations\202605042209131_DodanieInterwaluOcen.Designer.cs">
+      <DependentUpon>202605042209131_DodanieInterwaluOcen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\TicketMessageModel.cs" />
     <Compile Include="Models\TicketModel.cs" />
@@ -255,6 +259,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\bootstrap.rtl.css" />
     <Content Include="Content\bootstrap.rtl.min.css" />
+    <None Include="docker-compose.yml" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -317,9 +322,6 @@
     <Content Include="Views\Account\ResetPassword.cshtml" />
     <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
-    <Content Include="Views\Manage\Index.cshtml" />
-    <Content Include="Views\Manage\ManageLogins.cshtml" />
-    <Content Include="Views\Manage\SetPassword.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Devices\Details.cshtml" />
@@ -386,6 +388,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202605032008079_DodanieZgloszen.resx">
       <DependentUpon>202605032008079_DodanieZgloszen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605042209131_DodanieInterwaluOcen.resx">
+      <DependentUpon>202605042209131_DodanieInterwaluOcen.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

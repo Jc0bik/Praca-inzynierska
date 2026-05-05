@@ -27,6 +27,10 @@ namespace InzV3.Models
         [Required]
         [DisplayName("Status urządzenia")]
         public string status { get; set; }
+        [DisplayName("Data ostatniej oceny")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime? last_rated_at { get; set; }
         [Required]
         [DisplayName("Data końcowa gwarancji")]
         [DataType(DataType.Date)]

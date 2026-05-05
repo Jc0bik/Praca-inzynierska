@@ -8,6 +8,7 @@ using System.Data.Entity;
 using Microsoft.AspNet.Identity;
 using System.Runtime.Remoting.Messaging;
 using Microsoft.Ajax.Utilities;
+using System.Threading.Tasks;
 
 namespace InzV3.Controllers
 {
@@ -84,13 +85,13 @@ namespace InzV3.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult SendMessage(int id_ticket, string messageContent)
+        public async System.Threading.Tasks.Task<ActionResult> SendMessage(int id_ticket, string messageContent)
         {
             if (string.IsNullOrWhiteSpace(messageContent))
             {
                 return RedirectToAction("Details", new { id = id_ticket });
             }
-            var ticket = db.Tickets.Find(id_ticket);
+            var ticket = db .Tickets.Include(t => t.User).Include(t => t.Technician).FirstOrDefault(t => t.id_ticket == id_ticket);
             if (ticket == null || ticket.status == TicketStatuses.Zamkniete)
             {
                 return HttpNotFound();
@@ -110,6 +111,8 @@ namespace InzV3.Controllers
             };
             db.TicketMessages.Add(msg);
 
+            string oldStatus=ticket.status;
+
             /* jeżeli wiadomość została przez pracownika serwisu wysłana, to status sam zmieni się
              * na "Oczekuje na odpowiedź użytkownika"*/
             if (isTechOrAdmin)
@@ -119,7 +122,6 @@ namespace InzV3.Controllers
                 {
                     ticket.id_technician = userId;
                 }
-
             }
 
             // Jeśli to użytkownik odpisze, to status zmieni się na "Oczekuje na odpowiedź serwisu"
@@ -129,6 +131,12 @@ namespace InzV3.Controllers
             }
             ticket.updatedAt = DateTime.Now;
             db.SaveChanges();
+            if (oldStatus != ticket.status)
+            {
+                db.Entry(ticket).Reference(t=> t.Technician).Load();
+                await NotifyStatusChangeAsync(ticket);
+            }
+
             return RedirectToAction("Details", new { id = id_ticket });
         }
         // Tu zaczyna się sekcja dotycząca tylko serwisanta
@@ -172,32 +180,68 @@ namespace InzV3.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Pracownik Serwisu, Admin")]
-        public ActionResult AssignToMe(int id_ticket)
+        public async System.Threading.Tasks.Task<ActionResult> AssignToMe(int id_ticket)
         {
-            var ticket = db.Tickets.Find(id_ticket);
+            var ticket = db.Tickets.Include(t => t.User).Include(t => t.Technician).FirstOrDefault(t => t.id_ticket == id_ticket);
             if (ticket != null && ticket.status != TicketStatuses.Zamkniete)
             {
+                string oldStatus = ticket.status;
                 ticket.id_technician = User.Identity.GetUserId();
                 ticket.status = TicketStatuses.Przyjete;
                 ticket.updatedAt = DateTime.Now;
                 db.SaveChanges();
+                if (oldStatus != ticket.status)
+                {
+                    db.Entry(ticket).Reference(t => t.Technician).Load();
+                    await NotifyStatusChangeAsync(ticket);
+                }
             }
 
-
             return RedirectToAction("Details", new { id = id_ticket });
+        }
+
+        private async Task NotifyStatusChangeAsync(TicketModel ticket)
+        {
+            var emailService = new EmailService();
+            string subject = $"Zmiana statusu zgłoszenia #{ticket.id_ticket}";
+
+            string userBody = $"<h3> Status zgłoszenia {ticket.id_ticket} został zmieniony na: {ticket.status} </h3>" +
+                $"<p>Opis zgłoszenia: {ticket.description}</p>" +
+                $"<p>Data aktualizacji: {ticket.updatedAt}</p>";
+
+            await emailService.SendAsync(new IdentityMessage
+            {
+                Destination = ticket.User.Email,
+                Subject = subject,
+                Body = userBody
+            });
+
+            if(ticket.Technician != null)
+            {
+                string techBody = $"<h3> Status zgłoszenia {ticket.id_ticket} został zmieniony na: {ticket.status} </h3>" +
+                    $"<p>Opis zgłoszenia: {ticket.description}</p>" +
+                    $"<p>Data aktualizacji: {ticket.updatedAt}</p>";
+                await emailService.SendAsync(new IdentityMessage
+                {
+                    Destination = ticket.Technician.Email,
+                    Subject = subject,
+                    Body = techBody
+                });
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Pracownik Serwisu, Admin")]
-        public ActionResult ChangeStatus(int id_ticket, string newStatus)
+        public async System.Threading.Tasks.Task<ActionResult> ChangeStatus(int id_ticket, string newStatus)
         {
-            var ticket = db.Tickets.Find(id_ticket);
-            if (ticket != null)
+            var ticket = db.Tickets.Include(t => t.Technician).Include(t => t.User).FirstOrDefault(t => t.id_ticket == id_ticket);
+            if (ticket != null && ticket.status != newStatus)
             {
                 ticket.status = newStatus;
                 ticket.updatedAt = DateTime.Now;
                 db.SaveChanges();
+                await NotifyStatusChangeAsync(ticket);
             }
             return RedirectToAction("Details", new { id = id_ticket });
         }

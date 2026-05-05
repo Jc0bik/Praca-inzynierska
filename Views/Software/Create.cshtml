@@ -1,7 +1,7 @@
 ﻿@model InzV3.Models.SoftwareModel
 @{ ViewBag.Title = "Nowe oprogramowanie"; }
 
-<h2>Dodaj Oprogramowanie</h2>
+<h2 class="text-center">Dodaj Oprogramowanie</h2>
 <hr />
 
 @using (Html.BeginForm())
@@ -51,7 +51,7 @@
 
     <div class="mt-4">
         <button type="submit" class="btn btn-success px-4">Zapisz</button>
-        @Html.ActionLink("Wróć", "Index", null, new { @class = "btn btn-outline-secondary" })
+        @Html.ActionLink("Wróć", "Index", null, new { @class = "btn btn-secondary" })
     </div>
 }
 

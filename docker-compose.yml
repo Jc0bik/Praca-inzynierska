@@ -1,0 +1,8 @@
+﻿version: '3.8'
+services:
+  mailhog:
+    image: mailhog/mailhog
+    container_name: it_resources_mailhog
+    ports:
+      - "1025:1025" # server
+      - "8025:8025" # Web UI

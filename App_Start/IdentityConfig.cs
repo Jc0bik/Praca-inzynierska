@@ -11,15 +11,28 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using InzV3.Models;
+using System.Net.Mail;
 
 namespace InzV3
 {
     public class EmailService : IIdentityMessageService
     {
-        public Task SendAsync(IdentityMessage message)
+        public async Task SendAsync(IdentityMessage message)
         {
-            // Dołącz tutaj usługę poczty e-mail, aby wysłać wiadomość e-mail.
-            return Task.FromResult(0);
+            using (var client = new SmtpClient("localhost", 1025))
+            {
+                client.EnableSsl = false; // Nie wymaga ssl
+
+                var mailMessage = new MailMessage
+                {
+                    From = new MailAddress("service@itresources.com", "Serwis IT"),
+                    Subject = message.Subject,
+                    Body = message.Body,
+                    IsBodyHtml = true
+                };
+                mailMessage.To.Add(message.Destination);
+                await client.SendMailAsync(mailMessage);
+            }
         }
     }
 

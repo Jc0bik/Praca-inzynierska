@@ -28,6 +28,32 @@ namespace InzV3.Controllers
             {
                 return HttpNotFound("Nie masz uprawnień do przeglądania szczegółów tego urządzenia");
             }
+            var user=db .Users.Find(curentUserId);
+            var subRole=db.SubRoles.FirstOrDefault(s=>s.Name==user.SubRole);
+            int interval = 30;
+            if(subRole!= null) 
+            {
+                interval = subRole.RatingIntervalDays;
+            }
+
+            DateTime nextRatingDate=device.last_rated_at.HasValue
+                ? device.last_rated_at.Value.AddDays(interval)
+                : DateTime.MinValue; // to dla sytuacji kiedy sprzęt nie był nigdy oceniany
+
+            // Wymuszanie oceny, kiedy minie odpowiedni czas od ostatniej ocen
+            bool justRated = TempData["JustRated"] != null && (bool)TempData["JustRated"];
+            if (justRated)
+            {
+                ViewBag.ForceRating = false;
+            }
+            else
+            {
+                ViewBag.ForceRating = DateTime.Now >= nextRatingDate;
+            }    
+
+            ViewBag.NextRatingDate = device.last_rated_at.HasValue ? device.last_rated_at.Value.AddDays(interval): (DateTime?)null;
+            ViewBag.LastRatingDate = device.last_rated_at;
+
             ViewBag.Software = db.Software.Where(s => s.assigned_device == id).ToList();
             ViewBag.Ratings = db.DeviceRating.Where(r => r.id_device == id).ToList();
             return View(device);
@@ -39,7 +65,8 @@ namespace InzV3.Controllers
         {
             int id_device = int.Parse(form["id_device"]);
             string currentUserId = User.Identity.GetUserId();
-            if (!db.Devices.Any(d => d.id_device == id_device && d.id_user == currentUserId))
+            var device = db.Devices.FirstOrDefault(d=>d.id_device==id_device && d.id_user==currentUserId);
+            if (device == null)
             {
                 return new HttpUnauthorizedResult();
 
@@ -53,7 +80,9 @@ namespace InzV3.Controllers
                     rating.rating_value = int.Parse(val);
                 }
             }
+            device.last_rated_at = DateTime.Now;
             db.SaveChanges();
+            TempData["JustRated"] = true;
             return RedirectToAction("Details", new { id = id_device });
         }
     }

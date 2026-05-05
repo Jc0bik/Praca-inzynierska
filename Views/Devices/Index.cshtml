@@ -1,15 +1,30 @@
 ﻿@model IEnumerable<InzV3.Models.DeviceModel>
 
 @{
-    ViewBag.Title = "Urządzenia";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Urządzenia</h2>
-
+<h2 class="text-center">Urządzenia</h2>
+<hr />
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
+    </div>
+}
 <p>
-    @Html.ActionLink("Create New", "CreateOne", null, new { @class = "btn btn-outline-primary" })
+    @Html.ActionLink("Wróć", "Index", "Service", null, new { @class = "btn btn-secondary" })
+    @Html.ActionLink("Create New", "CreateOne", null, new { @class = "btn btn-success" })
 </p>
+
 <table class="table text-center align-middle" style="font-size:18px;">
     <tr>
         <th>
@@ -97,23 +112,26 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Anuluj</button>
-                <a id="confirmDeleteBtn" class="btn btn-danger me-1" href="#" role="button">Tak, usuń</a>
+                <form id="deleteForm" method="post" action="">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Usuń</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
 @section Scripts{
-<script>
+    <script>
         function openDeleteModal(deviceId, deviceName) {
             document.getElementById('deleteDeviceName').textContent = deviceName;
 
 
             var deleteUrl = '@Url.Action("Delete", "Devices")' + '/' + deviceId;
-            document.getElementById('confirmDeleteBtn').href = deleteUrl;
+            document.getElementById('deleteForm').action = deleteUrl;
 
 
             var deleteModal = new bootstrap.Modal(document.getElementById('globalDeleteModal'));
             deleteModal.show();
         }
-</script>
+    </script>
 }    

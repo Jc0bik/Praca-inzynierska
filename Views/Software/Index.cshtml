@@ -14,7 +14,8 @@
     };
 }
 
-<h2 class="mb-4">Oprogramowanie</h2>
+<h2 class="mb-4 text-center">Oprogramowanie</h2>
+<hr/>
 <div class="card mb-4 shadow-sm border-warning">
     <div class="card-body">
         @using (Html.BeginForm("Index", "Software", FormMethod.Get, new { @class = "row g-3 align-items-end" }))
@@ -55,15 +56,14 @@
                     <option value="Licencja wygasła" @(ViewBag.CurrentExpireFilter == "Licencja wygasła" ? "selected" : "")>Licencje wygasłe</option>
                 </select>
             </div>
-            <div class="col-md-auto">
+            <div class="col-md-auto d-flex gap-2">
                 <button type="submit" class="btn btn-warning w-100">Szukaj</button>
+                @Html.ActionLink("Dodaj", "Create", null, new { @class = "btn btn-success" })
             </div>
         }
     </div>
 </div>
-<p>
-    @Html.ActionLink("Dodaj", "Create", null, new { @class = "btn btn-success" })
-</p>
+
 <table class="table table-hover align-middle">
     <thead class="table-dark">
         <tr>
@@ -98,7 +98,7 @@
                 </td>
                 <td>@(string.IsNullOrEmpty(item.software_serial_number) ? "-" : item.software_serial_number)</td>
                 <td>
-                    <button class="btn btn-sm btn-outline-info" onclick="showKey('@item.license_key')">Szczegóły</button>
+                    <button class="btn btn-sm btn-primary" onclick="showKey('@item.license_key')">Szczegóły</button>
                     @Html.ActionLink("Zarządzaj", "Edit", new { id = item.id_software }, new { @class = "btn btn-sm btn-warning" })
                     @if (!item.assigned_device.HasValue)
                     {

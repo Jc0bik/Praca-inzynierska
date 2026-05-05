@@ -248,12 +248,23 @@ namespace InzV3.Controllers
             ViewBag.Users = new SelectList(users, "RealId", "DisplayText");
             return View("DeviceCreate", device);
         }
-        public ActionResult Delete(int id)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public ActionResult DeleteConfirmed(int id)
         {
             DeviceModel device = context.Devices.SingleOrDefault(d => d.id_device == id);
-            context.Entry(device).State = EntityState.Deleted;
-            context.SaveChanges();
-            return Redirect("/Devices");
+            if (device != null)
+            {
+                if(!string.IsNullOrEmpty(device.id_user))
+                {
+                    TempData["ErrorMessage"] = $"Nie można usunąć urządzenia (ID: {device.id_device}), ponieważ jest przypisane do użytkownika";
+                    return RedirectToAction("Index");
+                }
+                context.Devices.Remove(device);
+                context.SaveChanges();
+                TempData["SuccessMessage"] = $"Urządzenie zostało pomyślnie usunięte.";
+            }
+            return RedirectToAction("Index");
         }
 
         public ActionResult SearchName(string searchPh)

@@ -4,10 +4,10 @@
 @{
     ViewBag.Title = "Lista użytkowników";
 }
-<div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-    <h2><i class="bi bi-people text-warning me-2"></i>Użytkownicy systemu</h2>
-    <a href="@Url.Action("Index", "Service")" class="btn btn-secondary">Powrót</a>
-</div>
+<h2><i class="bi bi-people text-warning me-2"></i>Użytkownicy systemu</h2>
+<p>
+    @Html.ActionLink("Wróć", "Index", "Service", null, new { @class = "btn btn-secondary" })
+</p>
 <div class="card bg-light p-3 mb-4 shadow-sm">
     <form method="get" action="@Url.Action("Users","Service")">
         <div class="row g-2 align-items-center">

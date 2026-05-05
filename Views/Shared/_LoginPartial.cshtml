@@ -15,7 +15,9 @@
                 <li class="dropdown-header text-dark fw-bold">Witaj, @displayName!</li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
-                    @Html.ActionLink("Moje konto", "Index", "Manage", routeValues: null, htmlAttributes: new { @class = "dropdown-item" })
+                    <a class="dropdown-item d-flex align-items-center" href="@Url.Action("ChangePassword", "Manage")">
+                        <i class="bi bi-key me-2"></i> Zmień hasło
+                    </a>
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
