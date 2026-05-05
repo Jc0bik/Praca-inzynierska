@@ -19,6 +19,13 @@
 }
 <h2 class="text-center">@ViewBag.Title</h2>
 <hr/>
+@if (TempData["ErrorMessage"] !=null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                    <i class="bi bi-exclamation-octagon-fill"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
 <div class="row justify-content-center">
     <div class="col-lg-8 col-md-10">
         <div class="card mb-4">
@@ -185,7 +192,24 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="autoTicketModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-danger shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill"></i> Automatyczne zgłoszenie zostało wysłane!</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Z powodu niskiej oceny sprzętu, oraz troskę o komfort pracy, system automatycznie zgłosił problem do serwisu.
+                Niedługo obsługa serwisu skontaktuję się z Tobą w celu ustalenia, czy potrzebne są dalsze kroki.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+                <a href="@Url.Action("MyTickets", "Tickets")" class="btn btn-danger">Przejdź do zgłoszeń</a>
+            </div>
+        </div>
+    </div> 
+</div>
 @*Wymuszanie ocenienia sprzętu*@
 @section Scripts
     {
@@ -203,6 +227,12 @@
                     btn.style.display = 'none';
                 });
                 ratingModal.show();
+            }
+            var showAutoTicket = '@(TempData["AutoTicketCreated"] != null && (bool)TempData["AutoTicketCreated"])' === 'True';
+            if (showAutoTicket) {
+                var autoTicketModalEl = document.getElementById('autoTicketModal');
+                var autoTicketModal = new bootstrap.Modal(autoTicketModalEl);
+                autoTicketModal.show();
             }
         });
     </script>

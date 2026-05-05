@@ -34,7 +34,12 @@ namespace InzV3.Controllers
             {
                 return new HttpUnauthorizedResult();
             }
-
+            bool hasOpenTicket = db.Tickets.Any(t => t.id_device == id_device && t.status != TicketStatuses.Zamkniete);
+            if (hasOpenTicket)
+            {
+                TempData["ErrorMessage"] = "Nie można utworzyć nowego zgłoszenia dla tego urządzenia, ponieważ istnieje już otwarte zgłoszenie.";
+                return RedirectToAction("Details" ,"UserDevice", new { id = id_device });
+            }
             var ticket = new TicketModel
             {
                 id_device = id_device,
@@ -235,10 +240,18 @@ namespace InzV3.Controllers
         [Authorize(Roles = "Pracownik Serwisu, Admin")]
         public async System.Threading.Tasks.Task<ActionResult> ChangeStatus(int id_ticket, string newStatus)
         {
-            var ticket = db.Tickets.Include(t => t.Technician).Include(t => t.User).FirstOrDefault(t => t.id_ticket == id_ticket);
+            var ticket = db.Tickets.Include(t => t.Technician).Include(t => t.User).Include(t => t.Device).FirstOrDefault(t => t.id_ticket == id_ticket);
             if (ticket != null && ticket.status != newStatus)
             {
                 ticket.status = newStatus;
+                if(newStatus == TicketStatuses.WRealizacji)
+                {
+                    ticket.Device.status = "W serwisie";
+                }
+                else if(newStatus == TicketStatuses.Zamkniete)
+                {
+                    ticket.Device.status = string.IsNullOrEmpty(ticket.Device.id_user) ? "Nieprzypisany" : "W użyciu";
+                }
                 ticket.updatedAt = DateTime.Now;
                 db.SaveChanges();
                 await NotifyStatusChangeAsync(ticket);

@@ -72,17 +72,48 @@ namespace InzV3.Controllers
 
             }
             var ratings = db.DeviceRating.Where(r => r.id_device == id_device).ToList();
+
+            // Logika automatycznego zgłoszenia przy niskiej ocenie
+            bool isLowRating = false;
+            List<string>lowRatingDetails=new List<string>();
             foreach (var rating in ratings)
             {
                 string val = form["rating_" + rating.id_rating];
                 if (!string.IsNullOrEmpty(val))
                 {
                     rating.rating_value = int.Parse(val);
+                    if (rating.rating_value <= 1)
+                    {
+                        isLowRating = true;
+                        lowRatingDetails.Add($"{rating.category_name}: {rating.rating_value}/5");
+                    }
                 }
             }
+
             device.last_rated_at = DateTime.Now;
             db.SaveChanges();
             TempData["JustRated"] = true;
+
+            if (isLowRating)
+            {
+                bool hasOpenTicket = db.Tickets.Any(t => t.id_device == id_device && t.status != TicketStatuses.Zamkniete);
+                if (!hasOpenTicket)
+                {
+                    var ticket = new TicketModel
+                    {
+                        id_device = id_device,
+                        description = "Automatyczne zgłoszenie: niska ocena urządzenia\n" + string.Join("\n", lowRatingDetails),
+                        status = TicketStatuses.Wyslane,
+                        createdAt = DateTime.Now,
+                        updatedAt = DateTime.Now,
+                        id_user = currentUserId
+                    };
+                    db.Tickets.Add(ticket);
+                    db.SaveChanges();
+                    TempData["AutoTicketCreated"] = true;
+                }
+            }
+
             return RedirectToAction("Details", new { id = id_device });
         }
     }

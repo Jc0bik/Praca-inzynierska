@@ -29,10 +29,94 @@ namespace InzV3.Controllers
             context.Dispose();
         }
         // GET: Devices
-        public ActionResult Index()
+        // wyszukiwarka filtry i sama tabela urządzeń
+        public ActionResult Index(string searchString, int? categoryFilter, List<int> featureFilters, int? minRating, string assignFilter,string statusFilter, string sortOrder)
         {
-            List<DeviceModel> devices = context.Devices.Include(d=> d.User).ToList();
-            return View("Index", devices);
+            var devicesQuery = context.Devices.Include(d=>d.User).Include(d => d.Charachteristics.Select(c => c.DevFeature)).AsQueryable();
+            if(!string.IsNullOrWhiteSpace(searchString))
+            {
+                searchString = searchString.ToLower();
+                devicesQuery = devicesQuery.Where(d =>
+                    d.brand.ToLower().Contains(searchString) ||
+                    d.model.ToLower().Contains(searchString) ||
+                    d.serial_num.ToLower().Contains(searchString) ||
+                    d.id_device.ToString().Contains(searchString));
+            }
+            // Kategorie
+            if (categoryFilter.HasValue)
+            {
+                devicesQuery = devicesQuery.Where(d => d.Charachteristics.Any(c => c.id_category == categoryFilter.Value));
+            }
+            // cechy szczególne
+            if (featureFilters != null && featureFilters.Any())
+            {
+                foreach (var featureId in featureFilters)
+                {
+                    devicesQuery = devicesQuery.Where(d => d.Charachteristics.Any(c => c.id_dev_feature == featureId));
+                }
+            }
+            // Oceny - najniższa ocena musi być przynajmiej taka jak minRating
+            if (minRating.HasValue)
+            {
+                var devicesWithHigherRatings = context.DeviceRating
+                    .GroupBy(r => r.id_device)
+                    .Where(g => g.Min(r => r.rating_value) >= minRating.Value)
+                    .Select(g => g.Key)
+                    .ToList();
+                devicesQuery=devicesQuery.Where(d=> devicesWithHigherRatings.Contains(d.id_device));
+            }
+            // Przypisanie do konkretnego użytkownika
+            if(!string.IsNullOrEmpty(assignFilter))
+            {
+                if (assignFilter=="Nieprzypisane")
+                {
+                    devicesQuery = devicesQuery.Where(d => string.IsNullOrEmpty(d.id_user));
+                }
+                else
+                {
+                    devicesQuery = devicesQuery.Where(d => d.id_user== assignFilter);
+                }
+            }
+            // Filtrowanie po statusie
+            if (!string.IsNullOrEmpty(statusFilter))
+            {
+                devicesQuery = devicesQuery.Where(d => d.status == statusFilter);
+            }
+
+            // Sortowanie
+            switch (sortOrder)
+            {
+                case "id_desc":
+                    devicesQuery = devicesQuery.OrderByDescending(d => d.id_device);
+                    break;
+                case "warranty_asc":
+                    devicesQuery = devicesQuery.OrderBy(d => d.warranty);
+                    break;
+                case "warranty_desc":
+                    devicesQuery = devicesQuery.OrderByDescending(d => d.warranty);
+                    break;
+                default:
+                    devicesQuery = devicesQuery.OrderBy(d => d.id_device);
+                    break;
+            }
+            ViewBag.Categories=new SelectList(context.DevCategories.ToList(), "id_category", "category_name");
+            ViewBag.Features=new SelectList(context.DevFeatures.ToList(), "id_dev_feature", "dev_feature_name");
+            var users = context.Users.ToList().Select(u => new
+            {
+                Id = u.Id,
+                Name = $"{u.Email} | {u.FirstName} {u.LastName}"
+            }).ToList();
+            ViewBag.Users = new SelectList(users, "Id", "Name");
+            ViewBag.Statuses= new SelectList(context.Devices.Select(d=>d.status).Distinct().ToList());
+
+            ViewBag.CurrentCategory = categoryFilter;
+            ViewBag.CurrentSearch = searchString;
+            ViewBag.CurrentMinRating = minRating;
+            ViewBag.CurrentAssign = assignFilter;
+            ViewBag.CurrentStatus = statusFilter;
+            ViewBag.CurrentSort = sortOrder;
+            ViewBag.CurrentFeatureFilters = featureFilters;
+            return View("Index", devicesQuery.ToList());
         }
         public ActionResult Details(int? id)
         {

@@ -3,102 +3,168 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<h2 class="text-center">Urządzenia</h2>
-<hr />
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
-    </div>
-}
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
-    </div>
-}
-<p>
-    @Html.ActionLink("Wróć", "Index", "Service", null, new { @class = "btn btn-secondary" })
-    @Html.ActionLink("Create New", "CreateOne", null, new { @class = "btn btn-success" })
-</p>
-
-<table class="table text-center align-middle" style="font-size:18px;">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.id_device)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.brand)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.model)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.status)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.id_user)
-        </th>
-        <th></th>
-    </tr>
-
-    @foreach (var item in Model)
+<div class="mt-4">
+    <h2 class="text-center">Urządzenia</h2>
+    <hr />
+    @if (TempData["ErrorMessage"] != null)
     {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.id_device)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.brand)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.model)
-            </td>
-            <td>
-                @{
-                    if (string.Equals(item.status, "W użyciu", StringComparison.OrdinalIgnoreCase))
-                    {
-                        <span class="badge bg-success p-2" style="font-size:0.85em;"> W użyciu</span>
-                    }
-                    else if (string.Equals(item.status, "Nieprzypisany", StringComparison.OrdinalIgnoreCase))
-                    {
-                        <span class="badge bg-secondary p-2" style="font-size: 0.85em;">Nieprzypisany</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-secondary p-2" style="font-size: 0.85em;">@(string.IsNullOrEmpty(item.status) ? "Nieprzypisany" : item.status)</span>
-                    }
-                }
-            </td>
-            <td>
-                @{
-                    if (item.User != null)
-                    {
-                        <span class="fw-bold text-primary">@item.User.FirstName @item.User.LastName</span>
-                        <br /><small class="text-muted">@item.User.Email</small>
-                    }
-                    else
-                    {
-                        <span class="text-muted small">Brak</span>
-                    }
-                }
-
-            </td>
-            <td>
-                <a class="btn btn-primary me-1" href="@Url.Action("Edit", new { id = item.id_device })" role="button">Edytuj</a>
-                <a class="btn btn-secondary me-1" href="@Url.Action("Details", new { id = item.id_device })" role="button">Szczegóły</a>
-                <button type="button" class="btn btn-danger me-1" onclick="openDeleteModal('@item.id_device', '@item.brand @item.model')">
-                    Usuń
-                </button>
-
-            </td>
-        </tr>
-
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
+        </div>
     }
-</table>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
+        </div>
+    }
+    <div class="card bg-light p-3 mb-4 shadow-sm">
+        <form method="get" action="@Url.Action("Index", "Devices")">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">SN/Model/Marka</label>
+                    <input type="text" name="searchString" class="form-control form-control-sm" value="@ViewBag.CurrentSearch" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">Kategoria</label>
+                    @Html.DropDownList("categoryFilter", (SelectList)ViewBag.Categories,"Wszystkie", new { @class = "form-select form-select-sm" }) 
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Cechy szczególne</label>
+                    @Html.ListBox("featureFilters", (SelectList)ViewBag.Features, new { @class = "form-control form-control select2-multi", multiple = "multiple", id = "featureSelect" })
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">Ocena powyżej</label>
+                    <select name="minRating" class="form-select form-select-sm">
+                        <option value="">Brak</option>
+                        <option value="1" @(ViewBag.CurrentMinRating == 1 ? "selected" : "")>1+</option>
+                        <option value="2" @(ViewBag.CurrentMinRating == 2 ? "selected" : "")>2+</option>
+                        <option value="3" @(ViewBag.CurrentMinRating == 3 ? "selected" : "")>3+</option>
+                        <option value="4" @(ViewBag.CurrentMinRating == 4 ? "selected" : "")>4+</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Przypisany użytkownik</label>
+                    <select name="assignFilter" class="form-select form-select-sm">
+                        <option value="" @(string.IsNullOrEmpty(ViewBag.CurrentAssign) ? "selected" : "")>Wszystkie</option>
+                        <option value="Nieprzypisane" @(ViewBag.CurrentAssign == "Nieprzypisane" ? "selected" : "")>Nieprzypisane</option>
+                        @foreach (var user in (SelectList)ViewBag.Users)
+                        {
+                            <option value="@user.Value" @(ViewBag.CurrentAssign == user.Value ? "selected" : "")>@user.Text</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small text-muted mb-1">Status</label>
+                    @Html.DropDownList("statusFilter", (SelectList)ViewBag.Statuses,"Wszystkie", new { @class = "form-select form-select-sm" })
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-1">Sortowanie</label>
+                    <select name="sortOrder" class="form-select form-select-sm">
+                        <option value="id_asc" @(ViewBag.CurrentSort == "id_asc" ? "selected" : "")>ID: Rosnąco</option>
+                        <option value="id_desc" @(ViewBag.CurrentSort == "id_desc" ? "selected" : "")>ID: Malejąco</option>
+                        <option value="warranty_asc" @(ViewBag.CurrentSort == "warranty_asc" ? "selected" : "")>Gwarancja od najkrótszej</option>
+                        <option value="warranty_desc" @(ViewBag.CurrentSort == "warranty_desc" ? "selected" : "")>Gwarancja od najkrótszej</option>
+                    </select>
+                </div>
+                <div class="col-md-9 d-flex justify-content-end align-items-end mt-3">
+                    <a href="@Url.Action("Index", "Devices")" class="btn btn-outline-secondary btn-sm px-4 me-2">Resetuj filtry</a>
+                    <button type="submit" class="btn btn-primary btn-sm px-4">Filtruj</button>
+                </div>
+                </div>
+        </form>
+    </div>
+
+    <p>
+        @Html.ActionLink("Wróć", "Index", "Service", null, new { @class = "btn btn-secondary" })
+        @Html.ActionLink("Create New", "CreateOne", null, new { @class = "btn btn-success" })
+    </p>
+
+    <table class="table table-hover align-middle border shadow-sm text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>
+                    ID
+                </th>
+                <th>
+                    Marka oraz model
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Gwarancja
+                </th>
+                <th>
+                    Użytkownik
+                </th>
+                <th>
+                    Akcje
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold text-muted"> #@item.id_device</td>
+                    <td>
+                        <span class="fw-bold">@item.brand @item.model</span><br />
+                        <span class="text-muted small">SN: @item.serial_num</span>
+                    </td>
+                    <td>
+                        @{
+                            if (string.Equals(item.status, "W użyciu", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-success p-2"> W użyciu</span>
+                            }
+                            else if (string.Equals(item.status, "W serwisie", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-danger p-2">W Serwisie</span>
+                            }
+                            else if (string.Equals(item.status, "Nieprzypisany", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-secondary p-2">Nieprzypisany</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary p-2">@(string.IsNullOrEmpty(item.status) ? "Nieprzypisany" : item.status)</span>
+                            }
+                        }
+                    </td>
+                    <td>
+                        @(item.warranty.HasValue ? item.warranty.Value.ToString("dd.MM.yyyy") : "Brak")
+                    </td>
+                    <td>
+                        @{
+                            if (item.User != null)
+                            {
+                                <span class="fw-bold text-primary">@item.User.FirstName @item.User.LastName</span>
+                                <br /><small class="text-muted">@item.User.Email</small>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">Brak</span>
+                            }
+                        }
+
+                    </td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <a class="btn btn-sm btn-primary" href="@Url.Action("Edit", new { id = item.id_device })" role="button">Edytuj</a>
+                            <a class="btn btn-sm btn-warning" href="@Url.Action("Details", new { id = item.id_device })" role="button">Szczegóły</a>
+                            <button type="button" class="btn  btn-sm btn-danger" onclick="openDeleteModal('@item.id_device', '@item.brand @item.model')">
+                                Usuń
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+
+            }
+    </table>
+</div>
 <div class="modal fade text-start" id="globalDeleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -121,7 +187,23 @@
     </div>
 </div>
 @section Scripts{
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        $(document).ready(function() {
+            $('#featureSelect').select2({
+                theme: 'bootstrap-5',
+                width: '100%',
+                placeholder: "Wybierz cechy",
+                allowClear: true
+            });
+            var featureJsonStr = '@Html.Raw(Json.Encode(ViewBag.CurrentFeatureFilters ?? new List<int>()))';
+            var selectedFeatures = JSON.parse(featureJsonStr);
+            if (selectedFeatures.length > 0) {
+                $('#featureSelect').val(selectedFeatures).trigger('change');
+            }
+        });
         function openDeleteModal(deviceId, deviceName) {
             document.getElementById('deleteDeviceName').textContent = deviceName;
 
