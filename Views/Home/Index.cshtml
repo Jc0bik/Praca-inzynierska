@@ -12,7 +12,7 @@
             <p class="card-text">
                 <strong>Imię i Nazwisko:</strong> @Model.FirstName @Model.LastName <br />
                 <strong>E-mail:</strong> @Model.Email <br />
-                <strong>Podrola:</strong> @(Model.SubRole ?? "Brak")
+                <strong>Podrola:</strong> @(Model.SubRole?.Name ?? "Brak")
             </p>
         </div>
     </div>

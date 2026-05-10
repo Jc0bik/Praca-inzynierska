@@ -1,10 +1,6 @@
 ﻿using InzV3.Models;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using System;
-using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace InzV3.Controllers
@@ -16,12 +12,12 @@ namespace InzV3.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
         public ActionResult Index()
         {
-            var subRoles = db.SubRoles.OrderBy(s => s.ParentRoleName).ThenBy(s => s.Name).ToList();
+            var subRoles = db.SubRoles.Include(s => s.Role).OrderBy(s => s.Role.Name).ThenBy(s => s.Name).ToList();
             return View(subRoles);
         }
         public ActionResult Create()
         {
-            ViewBag.ParentRoles = new SelectList(new[] { "Admin", "Pracownik Serwisu", "Użytkownik" });
+            ViewBag.ParentRoles = new SelectList(db.Roles, "Id", "Name");
             return View();
         }
         [HttpPost]
@@ -30,17 +26,17 @@ namespace InzV3.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (db.SubRoles.Any(s => s.Name.ToLower() == model.Name.ToLower() && s.ParentRoleName==model.ParentRoleName))
+                if (db.SubRoles.Any(s => s.Name.ToLower() == model.Name.ToLower() && s.RoleId == model.RoleId))
                 {
                     ModelState.AddModelError("", "Taka rola już istnieje!");
-                    ViewBag.ParentRoles = new SelectList(new[] {"Admin", "Pracownik Serwisu", "Użytkownik"}, model.ParentRoleName);
+                    ViewBag.ParentRoles = new SelectList(db.Roles.ToList(), "Id", "Name", model.RoleId);
                     return View(model);
                 }
                 db.SubRoles.Add(model);
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.ParentRoles = new SelectList(new[] { "Admin", "Pracownik Serwisu", "Użytkownik" }, model.ParentRoleName);
+            ViewBag.ParentRoles = new SelectList(db.Roles.ToList(), "Id", "Name", model.RoleId);
             return View(model);
         }
         [HttpPost]
@@ -51,7 +47,7 @@ namespace InzV3.Controllers
             if (subRole != null)
             {
                 //zabezpieczenie przed usuwaniem roli do której są przypisani użytkownicy
-                if (db.Users.Any(u => u.SubRole == subRole.Name))
+                if (db.Users.Any(u => u.SubRoleId == id))
                 {
                     TempData["Error"] = "Nie można usunąć podroli, ponieważ są do niej przypisani użytkownicy.";
                     return RedirectToAction("Index");

@@ -228,6 +228,10 @@
     <Compile Include="Migrations\202605042209131_DodanieInterwaluOcen.Designer.cs">
       <DependentUpon>202605042209131_DodanieInterwaluOcen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202605101426417_RelacjaPodroli.cs" />
+    <Compile Include="Migrations\202605101426417_RelacjaPodroli.Designer.cs">
+      <DependentUpon>202605101426417_RelacjaPodroli.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\TicketMessageModel.cs" />
     <Compile Include="Models\TicketModel.cs" />
@@ -391,6 +395,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202605042209131_DodanieInterwaluOcen.resx">
       <DependentUpon>202605042209131_DodanieInterwaluOcen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202605101426417_RelacjaPodroli.resx">
+      <DependentUpon>202605101426417_RelacjaPodroli.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -23,7 +23,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-bold">Stanowisko</label>
-                    @Html.DropDownListFor(m => m.SubRole, new SelectList(Enumerable.Empty<SelectListItem>()), "Wybierz rolę główną!", new { @class = "form-select", id = "subRoleSelect" })
+                    @Html.DropDownListFor(m => m.SubRoleId, new SelectList(Enumerable.Empty<SelectListItem>()), "Wybierz rolę główną!", new { @class = "form-select", id = "subRoleSelect" })
                 </div>
                 <div class="mt-4 pt-2 border-top">
                     <button type="submit" class="btn btn-success">Zapisz zmiany</button>
@@ -48,10 +48,13 @@
                                value: '',
                                text: 'Wybierz podrolę'
                            }));
+                           var currentSubRoleId = '@Model.SubRoleId'; 
                            $.each(subRoles, function (index, subRole) {
+                               var isSelected = (subRole.value == currentSubRoleId) ? true : flase;
                                subRoleSelect.append($('<option/>', {
                                    value: subRole.value,
-                                   text: subRole.text
+                                   text: subRole.text,
+                                   selected: isSelected
                                })).show();
                            });
                        }

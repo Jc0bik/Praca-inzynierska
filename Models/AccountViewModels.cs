@@ -66,7 +66,7 @@ namespace InzV3.Models
         public string LastName { get; set; }
 
         [Display(Name ="Podrola użytkownika")]
-        public string SubRole { get; set; }
+        public int? SubRoleId { get; set; }
         [Required]
         [Display(Name = "Rola użytkownika")]
         public string RoleName { get; set; }

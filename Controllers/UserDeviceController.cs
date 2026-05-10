@@ -29,7 +29,7 @@ namespace InzV3.Controllers
                 return HttpNotFound("Nie masz uprawnień do przeglądania szczegółów tego urządzenia");
             }
             var user=db .Users.Find(curentUserId);
-            var subRole=db.SubRoles.FirstOrDefault(s=>s.Name==user.SubRole);
+            var subRole=db.SubRoles.FirstOrDefault(s=>s.Id==user.SubRoleId);
             int interval = 30;
             if(subRole!= null) 
             {

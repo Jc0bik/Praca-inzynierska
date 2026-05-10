@@ -23,7 +23,7 @@ namespace InzV3.Controllers
         }
         public ActionResult Users(string searchString, string roleFilter)
         {
-            var usersQuery = db.Users.AsQueryable();
+            var usersQuery = db.Users.Include(u => u.SubRole).AsQueryable();
             
 
             //wyszukiwanie użytkowników z listy
@@ -45,7 +45,8 @@ namespace InzV3.Controllers
                 LastName = u.LastName,
                 Email = u.Email,
                 Role = userRoles.FirstOrDefault(r => r.Id == u.Roles?.FirstOrDefault()?.RoleId)?.Name ?? "Brak",
-                SubRole = u.SubRole
+                SubRoleId = u.SubRoleId,
+                SubRoleName = u.SubRole != null ? u.SubRole.Name : "Brak"
             }).ToList();
 
             if (!string.IsNullOrEmpty(roleFilter))
@@ -57,7 +58,7 @@ namespace InzV3.Controllers
             return View();
         }
 
-        //GET: Admin/EditUser
+        //GET: Admin/   
         public ActionResult EditUser(string id)
         {
             var user = db.Users.Find(id);
@@ -71,7 +72,7 @@ namespace InzV3.Controllers
                 LastName = user.LastName,
                 Email = user.Email,
                 Role = roleName,
-                SubRole = user.SubRole
+                SubRoleId = user.SubRoleId
             };
             ViewBag.AllRoles= new SelectList(db.Roles.Select(r => r.Name).ToList());
             return View(model);
@@ -86,16 +87,22 @@ namespace InzV3.Controllers
                 var user = db.Users.Find(model.Id);
                 if (user != null)
                 {
-                    user.SubRole= model.SubRole;
                     var userManager = new UserManager<ApplicationUser>(new UserStore<ApplicationUser>(db));
                     var currentRoles = userManager.GetRoles(user.Id);
-                    
-                    // Zmiana roli
-                    userManager.RemoveFromRoles(user.Id, currentRoles.ToArray());
-                    if(!string.IsNullOrEmpty(model.Role) && model.Role != "Brak")
+                    var currentRoleName = currentRoles.FirstOrDefault();
+                    if (currentRoleName != model.Role)
                     {
-                        userManager.AddToRole(user.Id, model.Role);
+                        userManager.RemoveFromRoles(user.Id, currentRoles.ToArray());
+                        if (!string.IsNullOrEmpty(model.Role) && model.Role != "Brak")
+                        {
+                            userManager.AddToRole(user.Id, model.Role);
+                        }
+                        user.SubRoleId = model.SubRoleId;
                     }
+                    else
+                    {
+                        user.SubRoleId = model.SubRoleId;
+                    }   
                     db.SaveChanges();
                     TempData["SuccessMessage"] = "Zmieniono dane użytkownika";
                     return RedirectToAction("Users");
@@ -128,10 +135,9 @@ namespace InzV3.Controllers
         [HttpGet]
         public JsonResult GetSubRolesByRole(string roleName)
         {
-            var db = new ApplicationDbContext();
             var subRoles = db.SubRoles
-                .Where(s => s.ParentRoleName == roleName)
-                .Select(s => new { value = s.Name, text = s.Name })
+                .Where(s => s.Role.Name == roleName)
+                .Select(s => new { value = s.Id, text = s.Name })
                 .ToList();
             return Json(subRoles, JsonRequestBehavior.AllowGet);
         }
@@ -143,7 +149,8 @@ namespace InzV3.Controllers
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Role { get; set; }
-        public string SubRole { get; set; }
+        public int? SubRoleId { get; set; }
+        public string SubRoleName { get; set; }
     }
     public class EditUserViewModel
     {
@@ -152,7 +159,7 @@ namespace InzV3.Controllers
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Role { get; set; }
-        public string SubRole { get; set; }
+        public int? SubRoleId { get; set; }
     }
 }
 

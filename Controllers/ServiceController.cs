@@ -20,7 +20,7 @@ namespace InzV3.Controllers
         }
         public ActionResult Users(string searchString, string roleFilter)
         {
-            var usersQuery = context.Users.AsQueryable();
+            var usersQuery = context.Users.Include(u=>u.SubRole).AsQueryable();
             var userRoles = context.Roles.ToList();
 
             //wyszukiwanie użytkowników z listy
@@ -39,7 +39,8 @@ namespace InzV3.Controllers
                 LastName = u.LastName,
                 Email = u.Email,
                 Role = userRoles.FirstOrDefault(r => r.Id == u.Roles?.FirstOrDefault()?.RoleId)?.Name ?? "Brak",
-                SubRole = u.SubRole
+                SubRoleId = u.SubRoleId,
+                SubRoleName=u.SubRole!= null ? u.SubRole.Name : "Brak"
             }).ToList();
             if (!string.IsNullOrEmpty(roleFilter))
             {

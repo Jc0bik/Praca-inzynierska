@@ -14,7 +14,7 @@
         <div class="form-group row mb-3">
             <label class="col-md-2 col-form-label fw-bold">Rola nadrzędna</label>
             <div class="col-md-6">
-                @Html.DropDownListFor(m => m.ParentRoleName, (ViewBag.ParentRoles as SelectList), "Wybierz rolę nadrzędną", new { @class = "form-select", required = "required" })
+                @Html.DropDownListFor(m => m.RoleId, (ViewBag.ParentRoles as SelectList), "Wybierz rolę nadrzędną", new { @class = "form-select", required = "required" })
             </div>
         </div>
         <div class="form-group row mb-3">

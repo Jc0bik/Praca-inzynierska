@@ -162,7 +162,7 @@ namespace InzV3.Controllers
                     Email = model.Email,
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    SubRole = model.SubRole,
+                    SubRoleId = model.SubRoleId,
                     EmailConfirmed = true
                 };
                 var result = await UserManager.CreateAsync(user, model.Password);

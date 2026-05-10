@@ -56,9 +56,9 @@
                     }
                 </td>
                 <td>
-                    @if (!string.IsNullOrEmpty(user.SubRole))
+                    @if (user.SubRoleName!="Brak")
                     {
-                        <span class="badge bg-info text-dark">@user.SubRole</span>
+                        <span class="badge bg-info text-dark">@user.SubRoleName</span>
                     }
                     else
                     {

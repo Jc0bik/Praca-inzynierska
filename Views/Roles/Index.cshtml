@@ -27,7 +27,7 @@
             {
                 <tr>
                     <td class="fw-bold">
-                        <span class="badge bg-primary">@subRole.ParentRoleName</span>
+                        <span class="badge bg-primary">@(subRole.Role != null ? subRole.Role.Name : "Brak")</span>
                     </td>
                     <td>@subRole.Name</td>
                     <td>
