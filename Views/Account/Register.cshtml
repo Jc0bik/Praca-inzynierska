@@ -39,8 +39,7 @@
         <div class="form-group row mb-2">
             @Html.LabelFor(m => m.SubRoleId, new { @class = "col-md-3 col-form-label fw-bold text-md-end" })
             <div class="col-md-6">
-                @Html.DropDownListFor(m => m.SubRoleId, new SelectList(Enumerable.Empty <SelectListItem>()), "Wybierz rolę główną!", new { @class="form-select", id="subRoleSelect"})
-                <small class="form-text text-muted">Dotyczy tylko użytkownika z rolą "Pracownik.</small>
+                @Html.DropDownListFor(m => m.SubRoleId, new SelectList(Enumerable.Empty <SelectListItem>()), "Wybierz podrolę", new { @class="form-select", id="subRoleSelect"})
             </div>
         </div>
         <hr class="my-4" />

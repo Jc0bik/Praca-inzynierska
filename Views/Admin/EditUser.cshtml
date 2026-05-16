@@ -50,7 +50,7 @@
                            }));
                            var currentSubRoleId = '@Model.SubRoleId'; 
                            $.each(subRoles, function (index, subRole) {
-                               var isSelected = (subRole.value == currentSubRoleId) ? true : flase;
+                               var isSelected = (subRole.value == currentSubRoleId) ? true : false;
                                subRoleSelect.append($('<option/>', {
                                    value: subRole.value,
                                    text: subRole.text,

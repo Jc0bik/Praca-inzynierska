@@ -79,7 +79,7 @@ namespace InzV3.Controllers
                 ModelState.AddModelError("", "Nieprawidłowa próba logowania.");
                 return View(model);
             }
-            var result = await SignInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(user.UserName, model.Password, model.RememberMe, shouldLockout: true);
             switch (result)
             {
                 case SignInStatus.Success:
@@ -140,10 +140,12 @@ namespace InzV3.Controllers
         public ActionResult Register()
         {
             //lista ról
-            var db= new ApplicationDbContext();
-            var roles = db.Roles.Select(r => r.Name).ToList();
-            ViewBag.Roles= new SelectList(roles);
-            ViewBag.SubRoles = new SelectList(new[] { "Praca biurowa", "Pracownik terenowy", "Programista", "Grafik komputerowy" });
+            using (var db = new ApplicationDbContext())
+            {
+                var roles = db.Roles.Select(r => r.Name).ToList();
+                ViewBag.Roles = new SelectList(roles);
+            }
+            ViewBag.SubRoles = new SelectList(Enumerable.Empty<SelectListItem>());
             return View();
         }
 
@@ -174,10 +176,12 @@ namespace InzV3.Controllers
                 }
                 AddErrors(result);
             }
-            var db = new ApplicationDbContext();
-            var roles=db.Roles.Select(r => r.Name).ToList();
-            ViewBag.Roles = new SelectList(roles);
-            ViewBag.SubRoles = new SelectList(new List<string> { "Praca biurowa", "Pracownik terenowy", "Programista", "Grafik komputerowy" });
+            using(var db = new ApplicationDbContext())
+            {
+                var roles = db.Roles.Select(r => r.Name).ToList();
+                ViewBag.Roles = new SelectList(roles);
+            }
+            ViewBag.SubRoles = new SelectList(Enumerable.Empty<SelectListItem>());
 
             // Dotarcie do tego miejsca wskazuje, że wystąpił błąd, wyświetl ponownie formularz
             return View(model);

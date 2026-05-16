@@ -58,10 +58,10 @@ namespace InzV3.Controllers
             }
             switch (sortOrder)
             {
-                case "date_ascending":
+                case "date_asc":
                     software = software.OrderBy(s => s.license_end_date);
                     break;
-                case "date_descending":
+                case "date_desc":
                     software = software.OrderByDescending(s => s.license_end_date);
                     break;
                 default:
@@ -130,10 +130,18 @@ namespace InzV3.Controllers
         public ActionResult Delete(int id)
         {
             SoftwareModel software=db.Software.Find(id);
-            if(software!=null && software.assigned_device==null)
+            if (software != null) 
             {
-                db.Software.Remove(software);
-                db.SaveChanges();
+                if(software.assigned_device==null)
+                {
+                    db.Software.Remove(software);
+                    db.SaveChanges();
+                    TempData["SuccessMessage"] = "Oprogramowanie zostało usunięte.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Nie można usunąć oprogramowania przypisanego do urządzenia.";
+                }
             }
             return RedirectToAction("Index");
         }

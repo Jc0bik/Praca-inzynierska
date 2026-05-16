@@ -121,9 +121,10 @@ namespace InzV3.Controllers
             {
                 // Warunek blokujący usuwanie jeśli użytkownik ma do siebie przypisane urządzenia
                 bool hasDevices= db.Devices.Any(d => d.id_user == id);
+                bool hasTickets = db.Tickets.Any(t => t.id_user == id || t.id_technician == id);
                 if (hasDevices)
                 {
-                    TempData["ErrorMessage"] = "Nie można usunąć użytkownika, ponieważ ma przypisane urządzenia.";
+                    TempData["ErrorMessage"] = "Nie można usunąć użytkownika, ponieważ ma przypisane urządzenia lub otwarte zgłoszenie";
                     return RedirectToAction("Users");
                 }
                 db.Users.Remove(user);
